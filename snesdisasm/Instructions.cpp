@@ -169,9 +169,27 @@ Instruction::Instruction(uint8_t* data)
 }
 
 
-uint8_t Instruction::bytes()
+uint8_t Instruction::bytes() const
 {
     return opCodeByteSize[mOpcode];
+}
+
+bool Instruction::isJump() const
+{
+    switch(mOpcode)
+    {
+    case 0x20:
+    case 0x22:
+    case 0x4C:
+    case 0x5C:
+    case 0x6C:
+    case 0x7C:
+    case 0xDC:
+    case 0xFC:
+        return true;
+    default:
+        return false;
+    }
 }
 
 std::string to_hex_str(uint8_t s)
@@ -192,7 +210,7 @@ std::string to_hex_str(const Instruction::Argument_t& arg, uint8_t bytes)
     return s;
 }
 
-std::string Instruction::stringify()
+std::string Instruction::stringify() const
 {    
     std::string s(opCodes[mOpcode], 4);
     if(bytes() > 1){ //this instruction takes more than one byte. there is an argument

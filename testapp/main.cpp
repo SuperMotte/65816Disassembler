@@ -15,12 +15,9 @@ int main() {
 
     Disasm disasm(&TerranigmaROM);
     auto pos = TerranigmaROM.header().getInterruptDest(EmulationIV::RESET());
-    Disasm::Section section = disasm.disasm_until_jump(pos);
+    Disasm::Section section = disasm.disasmUntilJump(pos);
     
-    std::vector<Instruction>::size_type i;
-    for(i = 0; i < section.mInstructions.size(); ++i){
-        Instruction &ins = section.mInstructions[i];
-        
+    for(const Instruction& ins : section.mInstructions){
         std::cout << std::hex << pos << ": \t" << ins.stringify() << std::endl;
         pos += ins.bytes();
     }

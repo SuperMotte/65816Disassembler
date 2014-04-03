@@ -26,7 +26,7 @@ Disasm::Disasm(SNESROM *rom)
 {
 }
 
-Disasm::Section Disasm::disasm_until_jump(SNESROM::Address start, unsigned int max_instructions)
+Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max_instructions) const
 {
     Section section;
     section.mStart = start;
@@ -34,12 +34,15 @@ Disasm::Section Disasm::disasm_until_jump(SNESROM::Address start, unsigned int m
     
     for(unsigned int i = 0; i < max_instructions; ++i){
         Instruction inst = (*mRom)[pos];
-        
         section.mInstructions.push_back(inst);
-        
         pos += inst.bytes();
-        section.mEnd = pos - 1;
+
+        if(inst.isJump()){
+            break;
+        }
     }
+
+    section.mEnd = pos - 1;
     
     return section;
 }

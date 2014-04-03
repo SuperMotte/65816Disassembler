@@ -40,6 +40,7 @@ public:
             uint8_t at2;
         } as16_8;
     };
+
 private:
     uint8_t mOpcode;
     
@@ -52,9 +53,11 @@ public:
     static Instruction fromData(uint8_t *data){
         return Instruction(data);
     }
-    uint8_t bytes();
+    uint8_t bytes() const;
+
+    bool isJump() const;
     
-    std::string stringify();
+    std::string stringify() const;
 };
 
 #endif // INSTRUCTIONS_H
