@@ -40,6 +40,7 @@ public:
             uint8_t at2;
         } as16_8;
     };
+
 private:
     uint8_t mOpcode;
     
@@ -53,6 +54,8 @@ public:
         return Instruction(data);
     }
     uint8_t bytes() const;
+
+    bool isJump() const;
     
     std::string stringify() const;
 };

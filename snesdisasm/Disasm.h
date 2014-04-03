@@ -39,7 +39,7 @@ private:
 public:
     Disasm(SNESROM *rom);
     
-    Section disasm_until_jump(SNESROM::Address start, unsigned int max_instructions = 30);
+    Section disasmUntilJump(SNESROM::Address start, unsigned int max_instructions = 30) const;
 };
 
 #endif // DISASM_H

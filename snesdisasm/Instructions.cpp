@@ -174,6 +174,24 @@ uint8_t Instruction::bytes() const
     return opCodeByteSize[mOpcode];
 }
 
+bool Instruction::isJump() const
+{
+    switch(mOpcode)
+    {
+    case 0x20:
+    case 0x22:
+    case 0x4C:
+    case 0x5C:
+    case 0x6C:
+    case 0x7C:
+    case 0xDC:
+    case 0xFC:
+        return true;
+    default:
+        return false;
+    }
+}
+
 std::string to_hex_str(uint8_t s)
 {
     std::stringstream ss; 
