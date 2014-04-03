@@ -52,9 +52,9 @@ public:
     static Instruction fromData(uint8_t *data){
         return Instruction(data);
     }
-    uint8_t bytes();
+    uint8_t bytes() const;
     
-    std::string stringify();
+    std::string stringify() const;
 };
 
 #endif // INSTRUCTIONS_H
