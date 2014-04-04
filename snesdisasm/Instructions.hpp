@@ -28,24 +28,22 @@ class Instruction
 public:
     typedef uint16_t Address;
     
-    union Argument_t{
-        struct{
+    union Argument_t {
+        struct {
             uint8_t at1;
             uint8_t at2;
             uint8_t at3;
         } as8;
         
-        struct{
+        struct {
             uint16_t at1;
             uint8_t at2;
         } as16_8;
     };
 
 private:
-    uint8_t mOpcode;
-    
-    
-    Argument_t mArgument;
+    uint8_t m_OpCode;
+    Argument_t m_Argument;
     
     explicit Instruction(uint8_t *data);    
 public:
@@ -53,7 +51,7 @@ public:
     static Instruction fromData(uint8_t *data){
         return Instruction(data);
     }
-    uint8_t bytes() const;
+    uint8_t size() const;
 
     bool isJump() const;
     

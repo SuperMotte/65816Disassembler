@@ -23,7 +23,6 @@
 #include <sstream>
 
 //http://wiki.superfamicom.org/snes/show/Jay's+ASM+Tutorial
-//file://localhost/C:/Projekte/Terranigma_3D/Dokumente/65816%20Reference%20in%20SNES%20Development.mht
 enum AddressingMode : unsigned char {
     //der wert des parameters sei v
     //konkatenierung von daten sei :
@@ -36,7 +35,7 @@ enum AddressingMode : unsigned char {
     //      RX(H), RX(L) = Register X Hight, Register X Low
     //      
     IMMEDIATE,               //               v        v ist 1 oder 2 byte, je nach operation
-                             //                        operationen mit 2 byte haben einen anderen opcode als solche mit
+                             //                        operationen mit 2 byte haben einen anderen opCode als solche mit
                              //                        einem byte. vielleicht sollte man IMMEDIATE deshalb auftrennen
     ABSOLUTE,                // DBR :     v            v ist 2 byte. DRB ist das data bank register 
     DIRECT,  //Zero page     //  00 : (DPR + v)        v ist 1 byte. DPR(H) ist 00 im emulationsmodus
@@ -47,7 +46,7 @@ enum AddressingMode : unsigned char {
     DIRECT_INDEXED_WITH_X,   //  00 : (DPR + v + RX)   immer in bank 0. im 6502 emulation mode,
     DIRECT_INDEXED_WITH_Y,   //  00 : (DPR + v + RY)   ist es auch immer in page DPR. sonst springt es auf die nächste
     ACCUMULATOR,             //       A                es wird direkt im akkumulator gearbeitet
-    IMPLIED,                 //                        vom opcode bestimmt
+    IMPLIED,                 //                        vom opCode bestimmt
     STACK,                   //       SR               die adresse liegt in SR
     DIRECT_INDIRECT,         // DBR : s=[00 : DPR + v] v ist 1 byte. s sind 2 byte: (low : high)
     
@@ -139,7 +138,6 @@ uint8_t opCodeByteSize[256] = {
 /*0xF0*/      2,     2,     2,     2,     3,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4
 };
 
-
 AddressingMode opCodeAddressingMode[256] = {
 /* +                0x00                    0x01                            0x02                        0x03                        0x04                    0x05                 0x06                           0x07                   0x08             0x09              0x0A       0x0B            0x0C                          0x0D                     0x0E                     0x0F                */
 /*0x00*/ STACK                   , DIRECT_INDEXED_INDIRECT, STACK                        , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
@@ -161,64 +159,87 @@ AddressingMode opCodeAddressingMode[256] = {
 };
 
 Instruction::Instruction(uint8_t* data)
-    : mOpcode{data[0]} 
+    : m_OpCode{data[0]}
 {
-    if(bytes() > 1) mArgument.as8.at1 = data[1];
-    if(bytes() > 2) mArgument.as8.at2 = data[2];
-    if(bytes() > 3) mArgument.as8.at3 = data[3];
+    if(size() > 1) m_Argument.as8.at1 = data[1];
+    if(size() > 2) m_Argument.as8.at2 = data[2];
+    if(size() > 3) m_Argument.as8.at3 = data[3];
 }
 
-
-uint8_t Instruction::bytes() const
-{
-    return opCodeByteSize[mOpcode];
+uint8_t Instruction::size() const {
+    /*
+     //influenced opCodes by the size of register M are 09, 29, 49, 69 (tihihi^^), 89, A9, C9, E9
+            if(registerMIs16Byte) {
+                switch(m_opCode) {
+                case 0x09:
+                case 0x29:
+                case 0x49:
+                case 0x69:
+                case 0x89:
+                case 0xA9:
+                case 0xC9:
+                case 0xE9:
+                    ++size;
+                }
+            }
+            //influenced opCodes by the size of register X are A0, A2, C0, E0
+            if(registerXIs16Byte) {
+                switch(m_opCode) {
+                case 0xA0:
+                case 0xA2:
+                case 0xC0:
+                case 0xE0:
+                    ++size;
+                }
+            }
+    */
+    return opCodeByteSize[m_OpCode];
 }
 
-bool Instruction::isJump() const
-{
-    switch(mOpcode)
-    {
-    case 0x20:
-    case 0x22:
-    case 0x4C:
-    case 0x5C:
-    case 0x6C:
-    case 0x7C:
-    case 0xDC:
-    case 0xFC:
+bool Instruction::isJump() const {
+    switch(m_OpCode) {
+    case 0x10: //Branch if Plus
+    case 0x20: //Jump to Subroutine
+    case 0x30: //Branch if Minus
+    case 0x22: //Jump to Subroutine
+    case 0x4C: //Jump
+    case 0x5C: //Jump
+    case 0x6C: //Jump
+    case 0x7C: //Jump
+    case 0x80: //Branch Always
+    case 0xD0: //Branch if Not Equal
+    case 0xDC: //Jump
+    case 0xFC: //Jump to Subroutine
         return true;
     default:
         return false;
     }
 }
 
-std::string to_hex_str(uint8_t s)
-{
-    std::stringstream ss; 
+std::string toHexStr(uint8_t s) {
+    std::stringstream ss;
     ss << std::hex << int(s);
     return ss.str();
 }
 
-std::string to_hex_str(const Instruction::Argument_t& arg, uint8_t bytes)
-{
+std::string toHexStr(const Instruction::Argument_t& arg, uint8_t bytes) {
     std::string s;
     
-    if(bytes >= 1) s += to_hex_str(arg.as8.at1);
-    if(bytes >= 2) s += " " + to_hex_str(arg.as8.at2);
-    if(bytes >= 3) s += " " + to_hex_str(arg.as8.at3);
+    if(bytes >= 1) s += toHexStr(arg.as8.at1);
+    if(bytes >= 2) s += " " + toHexStr(arg.as8.at2);
+    if(bytes >= 3) s += " " + toHexStr(arg.as8.at3);
     
     return s;
 }
 
-std::string Instruction::stringify() const
-{    
-    std::string s(opCodes[mOpcode], 4);
-    if(bytes() > 1){ //this instruction takes more than one byte. there is an argument
-        AddressingMode mode = opCodeAddressingMode[mOpcode];
-        switch(mode){
+std::string Instruction::stringify() const {
+    std::string s(opCodes[m_OpCode]);
+    if(bytes() > 1) { //this instruction takes more than one byte. there is an argument
+        AddressingMode mode = opCodeAddressingMode[m_OpCode];
+        switch(mode) {
         
             default:
-                s += " " + to_hex_str(mArgument, bytes()-1) + " (unknown mode)";
+                s += " " + toHexStr(m_Argument, size()-1) + " (unknown mode)";
         }
     }
     

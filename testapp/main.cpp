@@ -17,7 +17,7 @@ int main() {
     auto pos = TerranigmaROM.header().getInterruptDest(EmulationIV::RESET());
     Disasm::Section section = disasm.disasmUntilJump(pos);
     
-    for(const Instruction& ins : section.mInstructions){
+    for(const Instruction& ins : section.mInstructions) {
         std::cout << std::hex << pos << ": \t" << ins.stringify() << std::endl;
         pos += ins.bytes();
     }
