@@ -3,7 +3,7 @@
 
 
 
-flagRegister::flagRegister(){
+flagRegister::flagRegister() {
     //set all flags to zero
     m_flags = 0x00;
 }

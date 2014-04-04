@@ -2,17 +2,17 @@
 
 using namespace std;
 
-Logger::Logger(const std::string& logPath){
+Logger::Logger(const std::string &logPath) {
     mLogStream.open(logPath, std::ios::out);
 }
 
-Logger::~Logger(){
+Logger::~Logger() {
     closeLog();
 }
 
-Logger& Logger::Instance(){
+Logger &Logger::Instance() {
     static Logger logger;
-    
+
     return logger;
 }
 
@@ -20,32 +20,31 @@ void Logger::closeLog() {
     mLogStream.close();
 }
 
-void Logger::writeLog(const std::string &message, const std::string& location, const std::string& kindOfMessage){
+void Logger::writeLog(const std::string &message, const std::string &location, const std::string &kindOfMessage) {
     mLastLog = kindOfMessage + message + " IN " + location;
-    
+
     const std::string::size_type size = mLastLog.size();
-    
+
     mLogStream << mLastLog << std::endl;
 }
 
-void Logger::log(Logger::LogType type, const string& message, const string& location)
-{
-    switch(type){
-        case Logger::LogType::ERROR:
-            writeLog(message, location, "FEHLER : ");
-            break;
-        case Logger::LogType::STATE:
-            writeLog(message, location, "STATUS : ");
-            break;
-        case Logger::LogType::WARNING:
-            writeLog(message , location, "WARNUNG: ");
-            break;
-        case Logger::LogType::HINT:
-            writeLog(message , location, "HINWEIS: ");
-            break;
-        case Logger::LogType::MESSAGE:
-            mLogStream << message << std::endl;
-            break;            
+void Logger::log(Logger::LogType type, const string &message, const string &location) {
+    switch(type) {
+    case Logger::LogType::ERROR:
+        writeLog(message, location, "FEHLER : ");
+        break;
+    case Logger::LogType::STATE:
+        writeLog(message, location, "STATUS : ");
+        break;
+    case Logger::LogType::WARNING:
+        writeLog(message , location, "WARNUNG: ");
+        break;
+    case Logger::LogType::HINT:
+        writeLog(message , location, "HINWEIS: ");
+        break;
+    case Logger::LogType::MESSAGE:
+        mLogStream << message << std::endl;
+        break;
     }
 }
 
@@ -57,7 +56,7 @@ void Logger::logBreak() {
     mLogStream << mLastLog << std::endl;
 }
 
-const std::string& Logger::lastLog() const{
+const std::string &Logger::lastLog() const {
     return mLastLog;
 }
 

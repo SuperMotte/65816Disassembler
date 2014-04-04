@@ -14,19 +14,19 @@ class Graph {
     struct Pos {
         float x, y;
     };
-public:
+  public:
     Graph() {};
-	
+
     void print(const Domain &domain) {
-        for (unsigned int y = 0; y <= domain.h; ++y) {
-            for (unsigned int x = 0; x <= domain.w; ++x) {
+        for(unsigned int y = 0; y <= domain.h; ++y) {
+            for(unsigned int x = 0; x <= domain.w; ++x) {
                 bool found = false;
-                for (Pos & n : m_nodes) {
-                    if (n.x >= x && n.x < x + 1 && n.y >= y && n.y < y + 1) {
+                for(Pos &n : m_nodes) {
+                    if(n.x >= x && n.x < x + 1 && n.y >= y && n.y < y + 1) {
                         found = true;
                     }
                 }
-                if (found) {
+                if(found) {
                     std::cout << "# ";
                 } else {
                     std::cout << ". ";
@@ -36,7 +36,7 @@ public:
         }
         std::cout << std::endl;
     }
-	
+
     unsigned int addNode(float x, float y) {
         m_nodes.resize(m_nodes.size() + 1);
         m_nodes.back().x = x;
@@ -55,15 +55,15 @@ public:
         acc.resize(m_nodes.size());
 
         auto pull_together = [&](const tbb::blocked_range<size_t> &range) {
-            for (int i = range.begin(); i != range.end(); ++i) {
+            for(int i = range.begin(); i != range.end(); ++i) {
                 acc[i].x = m_nodes[i].x;
                 acc[i].y = m_nodes[i].y;
-                for (unsigned int j : m_adj[i]) {
+                for(unsigned int j : m_adj[i]) {
                     //check all connected nodes
                     float dx = m_nodes[j].x - m_nodes[i].x;
                     float dy = m_nodes[j].y - m_nodes[i].y;
                     float lenSq = dx * dx + dy * dy;
-                    if (lenSq == 0) {
+                    if(lenSq == 0) {
                         continue;
                     }
                     float len = sqrt(lenSq);
@@ -75,17 +75,17 @@ public:
         };
 
         auto push_apart = [&](const tbb::blocked_range<size_t> &range) {
-            for (int i = range.begin(); i != range.end(); ++i) {
+            for(int i = range.begin(); i != range.end(); ++i) {
                 acc[i].x = m_nodes[i].x;
                 acc[i].y = m_nodes[i].y;
-                for (int j = 0; j < m_nodes.size(); ++j) {
-                    if (i == j) {
+                for(int j = 0; j < m_nodes.size(); ++j) {
+                    if(i == j) {
                         continue;
                     }
                     float dx = m_nodes[j].x - m_nodes[i].x;
                     float dy = m_nodes[j].y - m_nodes[i].y;
                     float lenSq = dx * dx + dy * dy;
-                    if (lenSq == 0) {
+                    if(lenSq == 0) {
                         continue;
                     }
                     float len = sqrt(lenSq);
@@ -96,37 +96,45 @@ public:
             }
         };
 
-        for (unsigned int i = 0; i < steps; ++i) {
+        for(unsigned int i = 0; i < steps; ++i) {
             tbb::parallel_for(tbb::blocked_range<size_t> (0, m_nodes.size()), pull_together);
             std::swap(acc, m_nodes);
             tbb::parallel_for(tbb::blocked_range<size_t> (0, m_nodes.size()), push_apart);
             std::swap(acc, m_nodes);
         }
 
-        if(m_nodes.size() >= 1){
-            Pos min{m_nodes[0].x, m_nodes[0].y};
-            Pos max{m_nodes[0].x, acc[0].y};
+        if(m_nodes.size() >= 1) {
+            Pos min {m_nodes[0].x, m_nodes[0].y};
+            Pos max {m_nodes[0].x, acc[0].y};
 
-            for(const Pos& p: m_nodes){
-                if(p.x < min.x) min.x = p.x;
-                if(p.y < min.y) min.y = p.y;
-                if(p.x > max.x) max.x = p.x;
-                if(p.y > max.y) max.y = p.y;
+            for(const Pos &p : m_nodes) {
+                if(p.x < min.x) {
+                    min.x = p.x;
+                }
+                if(p.y < min.y) {
+                    min.y = p.y;
+                }
+                if(p.x > max.x) {
+                    max.x = p.x;
+                }
+                if(p.y > max.y) {
+                    max.y = p.y;
+                }
             }
 
-            float scaleX = float(domain.w)/(max.x - min.y);
-            float scaleY = float(domain.h)/(max.y - min.y);
+            float scaleX = float(domain.w) / (max.x - min.y);
+            float scaleY = float(domain.h) / (max.y - min.y);
             float offsetX = min.x * scaleX;
             float offsetY = min.y * scaleY;
 
-            for(Pos& p: m_nodes){
+            for(Pos &p : m_nodes) {
                 p.x = p.x * scaleX - offsetX;
                 p.y = p.y * scaleY - offsetY;
             }
         }
     }
 
-private:
+  private:
     std::vector<Pos> m_nodes;
     std::vector<std::set<unsigned int>> m_adj;
 };

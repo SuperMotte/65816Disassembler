@@ -23,38 +23,37 @@
 #include <cstdint>
 #include <string>
 
-class Instruction
-{
-public:
+class Instruction {
+  public:
     typedef uint16_t Address;
-    
+
     union Argument_t {
         struct {
             uint8_t at1;
             uint8_t at2;
             uint8_t at3;
         } as8;
-        
+
         struct {
             uint16_t at1;
             uint8_t at2;
         } as16_8;
     };
 
-private:
+  private:
     uint8_t m_OpCode;
     Argument_t m_Argument;
-    
-    explicit Instruction(uint8_t *data);    
-public:
-    
-    static Instruction fromData(uint8_t *data){
+
+    explicit Instruction(uint8_t *data);
+  public:
+
+    static Instruction fromData(uint8_t *data) {
         return Instruction(data);
     }
     uint8_t size() const;
 
     bool isJump() const;
-    
+
     std::string stringify() const;
 };
 

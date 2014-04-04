@@ -22,27 +22,25 @@
 #include <iostream>
 
 Disasm::Disasm(SNESROM *rom)
-    : mRom(rom)
-{
+    : mRom(rom) {
 }
 
-Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max_instructions) const
-{
+Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max_instructions) const {
     Section section;
     section.mStart = start;
     SNESROM::Address pos = start;
-    
-    for(unsigned int i = 0; i < max_instructions; ++i){
+
+    for(unsigned int i = 0; i < max_instructions; ++i) {
         Instruction inst = (*mRom)[pos];
         section.mInstructions.push_back(inst);
         pos += inst.bytes();
 
-        if(inst.isJump()){
+        if(inst.isJump()) {
             break;
         }
     }
 
     section.mEnd = pos - 1;
-    
+
     return section;
 }

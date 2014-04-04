@@ -20,13 +20,13 @@ enum flagRegisterNames : unsigned char {
 /**
  * @brief The flagRegister class contains the states of the processorflags of a 65816 procssor.
  */
-class flagRegister{
-private:
+class flagRegister {
+  private:
     /**
      * @brief m_flags is a char representing a bitmask representing the processorflags. The names of the bits (flags) are found in the flagRegisterNames enum.
      */
     unsigned char m_flags;
-public:
+  public:
     /**
      * @brief flagRegister creates an instance of flagRegister and sets all flags to zero.
      */

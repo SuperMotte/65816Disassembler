@@ -33,13 +33,13 @@ enum AddressingMode : unsigned char {
     //      das ergebnis jeder gleichung ist eine adresse. eine ausnahme bildet IMMEDIATE, welches ein wert ist
     //      RX, RY, SR = RegisterX, RegisterY, StackRegister
     //      RX(H), RX(L) = Register X Hight, Register X Low
-    //      
+    //
     IMMEDIATE,               //               v        v ist 1 oder 2 byte, je nach operation
-                             //                        operationen mit 2 byte haben einen anderen opCode als solche mit
-                             //                        einem byte. vielleicht sollte man IMMEDIATE deshalb auftrennen
-    ABSOLUTE,                // DBR :     v            v ist 2 byte. DRB ist das data bank register 
+    //                                                 operationen mit 2 byte haben einen anderen opCode als solche mit
+    //                                                 einem byte. vielleicht sollte man IMMEDIATE deshalb auftrennen
+    ABSOLUTE,                // DBR :     v            v ist 2 byte. DRB ist das data bank register
     DIRECT,  //Zero page     //  00 : (DPR + v)        v ist 1 byte. DPR(H) ist 00 im emulationsmodus
-                             //                        soll wirklich byte 0000:v adressiert werden, muss !v stehen
+    //                                                 soll wirklich byte 0000:v adressiert werden, muss !v stehen
     ABSOLUTE_INDEXED_WITH_X, //  RX + (DBR : v)        v ist 2 byte, RX ist je nach flag(x) 1 oder 2 byte
     ABSOLUTE_INDEXED_WITH_Y, //  RY + (DBR : v)        ist v < 100, muss es !v sein
     ABSOLUTE_LONG,           //           v            v ist volle 3 byte
@@ -49,10 +49,10 @@ enum AddressingMode : unsigned char {
     IMPLIED,                 //                        vom opCode bestimmt
     STACK,                   //       SR               die adresse liegt in SR
     DIRECT_INDIRECT,         // DBR : s=[00 : DPR + v] v ist 1 byte. s sind 2 byte: (low : high)
-    
-    
-    
-    
+
+
+
+
     //IMMEDIATE_MEMORY_FLAG,           //
     //IMMEDIATE_INDEX_FLAG,            //
     //IMMEDIATE_8_BIT,                 //
@@ -72,7 +72,7 @@ enum AddressingMode : unsigned char {
     BLOCK_MOVE,                      //move #registerA bytes from value1:registerY to value2:registerX
 
 
-    
+
     ABSOLUTE_INDEXED_LONG_WITH_X,
     PROGRAMMCOUNTER_RELATIVE,
     PROGRAMMCOUNTER_RELATIVE_LONG,
@@ -99,71 +99,76 @@ enum AddressingMode : unsigned char {
 //  x    y          x)   ,y               x    y        ,x        ,y
 
 const char opCodes[256][4] = {
-/* +         0x00   0x01   0x02   0x03   0x04   0x05   0x06   0x07   0x08   0x09   0x0A   0x0B   0x0C   0x0D   0x0E   0x0F*/
-/*0x00*/    "BRK", "ORA", "COP", "ORA", "TSB", "ORA", "ASL", "ORA", "PHP", "ORA", "ASL", "PHD", "TSB", "ORA", "ASL", "ORA",
-/*0x10*/    "BPL", "ORA", "ORA", "ORA", "TRB", "ORA", "ASL", "ORA", "CLC", "ORA", "INC", "TCS", "TRB", "ORA", "ASL", "ORA",
-/*0x20*/    "JSR", "AND", "JSR", "AND", "BIT", "AND", "ROL", "AND", "PLP", "AND", "ROL", "PLD", "BIT", "AND", "ROL", "AND",
-/*0x30*/    "BMI", "AND", "AND", "AND", "BIT", "AND", "ROL", "AND", "SEC", "AND", "DEC", "TSC", "BIT", "AND", "ROL", "AND",
-/*0x40*/    "RTI", "EOR", "WDM", "EOR", "MVN", "EOR", "LSR", "EOR", "PHA", "EOR", "LSR", "PHK", "JMP", "EOR", "LSR", "EOR",
-/*0x50*/    "BVC", "EOR", "EOR", "EOR", "MVN", "EOR", "LSR", "EOR", "CLI", "EOR", "PHY", "TCD", "JMP", "EOR", "LSR", "EOR",
-/*0x60*/    "RTS", "ADC", "PER", "ADC", "STZ", "ADC", "ROR", "ADC", "PLA", "ADC", "ROR", "RTL", "JMP", "ADC", "ROR", "ADC",
-/*0x70*/    "BVS", "ADC", "ADC", "ADC", "STZ", "ADC", "ROR", "ADC", "SEI", "ADC", "PLY", "TDC", "JMP", "ADC", "ROR", "ADC",
-/*0x80*/    "BRA", "STA", "BRL", "STA", "STY", "STA", "STX", "STA", "DEY", "STA", "TXA", "PHB", "STY", "STA", "STX", "STA",
-/*0x90*/    "BCC", "STA", "STA", "STA", "STY", "STA", "STX", "STA", "TYA", "STA", "TXS", "TXY", "STZ", "STA", "STZ", "STA",
-/*0xA0*/    "LDY", "LDA", "LDX", "LDA", "LDY", "LDA", "LDX", "LDA", "TAY", "LDA", "TAX", "PLB", "LDY", "LDA", "LDX", "LDA",
-/*0xB0*/    "BCS", "LDA", "LDA", "LDA", "LDY", "LDA", "LDX", "LDA", "CLV", "LDA", "TSX", "TYX", "LDY", "LDA", "LDX", "LDA",
-/*0xC0*/    "CPY", "CMP", "REP", "CMP", "CPY", "CMP", "DEC", "CMP", "INY", "CMP", "DEX", "WAI", "CPY", "CMP", "DEC", "CMP",
-/*0xD0*/    "BNE", "CMP", "CMP", "CMP", "PEI", "CMP", "DEC", "CMP", "CLD", "CMP", "PHX", "STP", "JMP", "CMP", "DEC", "CMP",
-/*0xE0*/    "CPX", "SBC", "SEP", "SBC", "CPX", "SBC", "INC", "SBC", "INX", "SBC", "NOP", "XBA", "CPX", "SBC", "INC", "SBC",
-/*0xF0*/    "BEQ", "SBC", "SBC", "SBC", "PEA", "SBC", "INC", "SBC", "SED", "SBC", "PLX", "XCE", "JSR", "SBC", "INC", "SBC"
+    /* +         0x00   0x01   0x02   0x03   0x04   0x05   0x06   0x07   0x08   0x09   0x0A   0x0B   0x0C   0x0D   0x0E   0x0F*/
+    /*0x00*/    "BRK", "ORA", "COP", "ORA", "TSB", "ORA", "ASL", "ORA", "PHP", "ORA", "ASL", "PHD", "TSB", "ORA", "ASL", "ORA",
+    /*0x10*/    "BPL", "ORA", "ORA", "ORA", "TRB", "ORA", "ASL", "ORA", "CLC", "ORA", "INC", "TCS", "TRB", "ORA", "ASL", "ORA",
+    /*0x20*/    "JSR", "AND", "JSR", "AND", "BIT", "AND", "ROL", "AND", "PLP", "AND", "ROL", "PLD", "BIT", "AND", "ROL", "AND",
+    /*0x30*/    "BMI", "AND", "AND", "AND", "BIT", "AND", "ROL", "AND", "SEC", "AND", "DEC", "TSC", "BIT", "AND", "ROL", "AND",
+    /*0x40*/    "RTI", "EOR", "WDM", "EOR", "MVN", "EOR", "LSR", "EOR", "PHA", "EOR", "LSR", "PHK", "JMP", "EOR", "LSR", "EOR",
+    /*0x50*/    "BVC", "EOR", "EOR", "EOR", "MVN", "EOR", "LSR", "EOR", "CLI", "EOR", "PHY", "TCD", "JMP", "EOR", "LSR", "EOR",
+    /*0x60*/    "RTS", "ADC", "PER", "ADC", "STZ", "ADC", "ROR", "ADC", "PLA", "ADC", "ROR", "RTL", "JMP", "ADC", "ROR", "ADC",
+    /*0x70*/    "BVS", "ADC", "ADC", "ADC", "STZ", "ADC", "ROR", "ADC", "SEI", "ADC", "PLY", "TDC", "JMP", "ADC", "ROR", "ADC",
+    /*0x80*/    "BRA", "STA", "BRL", "STA", "STY", "STA", "STX", "STA", "DEY", "STA", "TXA", "PHB", "STY", "STA", "STX", "STA",
+    /*0x90*/    "BCC", "STA", "STA", "STA", "STY", "STA", "STX", "STA", "TYA", "STA", "TXS", "TXY", "STZ", "STA", "STZ", "STA",
+    /*0xA0*/    "LDY", "LDA", "LDX", "LDA", "LDY", "LDA", "LDX", "LDA", "TAY", "LDA", "TAX", "PLB", "LDY", "LDA", "LDX", "LDA",
+    /*0xB0*/    "BCS", "LDA", "LDA", "LDA", "LDY", "LDA", "LDX", "LDA", "CLV", "LDA", "TSX", "TYX", "LDY", "LDA", "LDX", "LDA",
+    /*0xC0*/    "CPY", "CMP", "REP", "CMP", "CPY", "CMP", "DEC", "CMP", "INY", "CMP", "DEX", "WAI", "CPY", "CMP", "DEC", "CMP",
+    /*0xD0*/    "BNE", "CMP", "CMP", "CMP", "PEI", "CMP", "DEC", "CMP", "CLD", "CMP", "PHX", "STP", "JMP", "CMP", "DEC", "CMP",
+    /*0xE0*/    "CPX", "SBC", "SEP", "SBC", "CPX", "SBC", "INC", "SBC", "INX", "SBC", "NOP", "XBA", "CPX", "SBC", "INC", "SBC",
+    /*0xF0*/    "BEQ", "SBC", "SBC", "SBC", "PEA", "SBC", "INC", "SBC", "SED", "SBC", "PLX", "XCE", "JSR", "SBC", "INC", "SBC"
 };
 
 uint8_t opCodeByteSize[256] = {
-/* +         0x00   0x01   0x02   0x03   0x04   0x05   0x06   0x07   0x08   0x09   0x0A   0x0B   0x0C   0x0D   0x0E   0x0F*/
-/*0x00*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0x10*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0x20*/      3,     2,     4,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0x30*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0x40*/      1,     2,     2,     2,     3,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0x50*/      2,     2,     2,     2,     3,     2,     2,     2,     1,     3,     1,     1,     4,     3,     3,     4,
-/*0x60*/      1,     2,     3,     2,     2,     2,     2,     2,     1,     2,     3,     1,     3,     3,     3,     4,
-/*0x70*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0x80*/      2,     2,     3,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0x90*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0xA0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0xB0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0xC0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0xD0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
-/*0xE0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
-/*0xF0*/      2,     2,     2,     2,     3,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4
+    /* +         0x00   0x01   0x02   0x03   0x04   0x05   0x06   0x07   0x08   0x09   0x0A   0x0B   0x0C   0x0D   0x0E   0x0F*/
+    /*0x00*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0x10*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0x20*/      3,     2,     4,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0x30*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0x40*/      1,     2,     2,     2,     3,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0x50*/      2,     2,     2,     2,     3,     2,     2,     2,     1,     3,     1,     1,     4,     3,     3,     4,
+    /*0x60*/      1,     2,     3,     2,     2,     2,     2,     2,     1,     2,     3,     1,     3,     3,     3,     4,
+    /*0x70*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0x80*/      2,     2,     3,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0x90*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0xA0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0xB0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0xC0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0xD0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4,
+    /*0xE0*/      2,     2,     2,     2,     2,     2,     2,     2,     1,     2,     1,     1,     3,     3,     3,     4,
+    /*0xF0*/      2,     2,     2,     2,     3,     2,     2,     2,     1,     3,     1,     1,     3,     3,     3,     4
 };
 
 AddressingMode opCodeAddressingMode[256] = {
-/* +                0x00                    0x01                            0x02                        0x03                        0x04                    0x05                 0x06                           0x07                   0x08             0x09              0x0A       0x0B            0x0C                          0x0D                     0x0E                     0x0F                */
-/*0x00*/ STACK                   , DIRECT_INDEXED_INDIRECT, STACK                        , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0x10*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT               , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, ACCUMULATOR, IMPLIED, ABSOLUTE                 , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0x20*/ ABSOLUTE                , DIRECT_INDEXED_INDIRECT, ABSOLUTE_LONG                , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0x30*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, ACCUMULATOR, IMPLIED, ABSOLUTE_INDEXED_WITH_X  , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0x40*/ STACK                   , DIRECT_INDEXED_INDIRECT, RESERVED                     , STACK_RELATIVE                , BLOCK_MOVE           , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0x50*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, BLOCK_MOVE           , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_LONG            , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0x60*/ STACK                   , DIRECT_INDEXED_INDIRECT, STACK                        , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE_INDIRECT        , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0x70*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0x80*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDEXED_INDIRECT, PROGRAMMCOUNTER_RELATIVE_LONG, STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0x90*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_Y, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0xA0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0xB0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_Y, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, IMPLIED    , IMPLIED, ABSOLUTE_INDEXED_WITH_X  , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_Y, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0xC0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0xD0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDIRECT_LONG   , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
-/*0xE0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
-/*0xF0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X
+    /* +                0x00                    0x01                            0x02                        0x03                        0x04                    0x05                 0x06                           0x07                   0x08             0x09              0x0A       0x0B            0x0C                          0x0D                     0x0E                     0x0F                */
+    /*0x00*/ STACK                   , DIRECT_INDEXED_INDIRECT, STACK                        , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0x10*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT               , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, ACCUMULATOR, IMPLIED, ABSOLUTE                 , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0x20*/ ABSOLUTE                , DIRECT_INDEXED_INDIRECT, ABSOLUTE_LONG                , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0x30*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, ACCUMULATOR, IMPLIED, ABSOLUTE_INDEXED_WITH_X  , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0x40*/ STACK                   , DIRECT_INDEXED_INDIRECT, RESERVED                     , STACK_RELATIVE                , BLOCK_MOVE           , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0x50*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, BLOCK_MOVE           , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_LONG            , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0x60*/ STACK                   , DIRECT_INDEXED_INDIRECT, STACK                        , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , STACK  , IMMEDIATE              , ACCUMULATOR, STACK  , ABSOLUTE_INDIRECT        , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0x70*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0x80*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDEXED_INDIRECT, PROGRAMMCOUNTER_RELATIVE_LONG, STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0x90*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_Y, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0xA0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , STACK  , ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0xB0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_Y, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, IMPLIED    , IMPLIED, ABSOLUTE_INDEXED_WITH_X  , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_Y, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0xC0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0xD0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDIRECT_LONG   , ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X,
+    /*0xE0*/ IMMEDIATE               , DIRECT_INDEXED_INDIRECT, IMMEDIATE                    , STACK_RELATIVE                , DIRECT               , DIRECT               , DIRECT               , DIRECT_INDIRECT_LONG               , IMPLIED, IMMEDIATE              , IMPLIED    , IMPLIED, ABSOLUTE                 , ABSOLUTE               , ABSOLUTE               , ABSOLUTE_LONG,
+    /*0xF0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X
 };
 
-Instruction::Instruction(uint8_t* data)
-    : m_OpCode{data[0]}
-{
-    if(size() > 1) m_Argument.as8.at1 = data[1];
-    if(size() > 2) m_Argument.as8.at2 = data[2];
-    if(size() > 3) m_Argument.as8.at3 = data[3];
+Instruction::Instruction(uint8_t *data)
+    : m_OpCode {data[0]} {
+    if(size() > 1) {
+        m_Argument.as8.at1 = data[1];
+    }
+    if(size() > 2) {
+        m_Argument.as8.at2 = data[2];
+    }
+    if(size() > 3) {
+        m_Argument.as8.at3 = data[3];
+    }
 }
 
 uint8_t Instruction::size() const {
@@ -222,13 +227,19 @@ std::string toHexStr(uint8_t s) {
     return ss.str();
 }
 
-std::string toHexStr(const Instruction::Argument_t& arg, uint8_t bytes) {
+std::string toHexStr(const Instruction::Argument_t &arg, uint8_t bytes) {
     std::string s;
-    
-    if(bytes >= 1) s += toHexStr(arg.as8.at1);
-    if(bytes >= 2) s += " " + toHexStr(arg.as8.at2);
-    if(bytes >= 3) s += " " + toHexStr(arg.as8.at3);
-    
+
+    if(bytes >= 1) {
+        s += toHexStr(arg.as8.at1);
+    }
+    if(bytes >= 2) {
+        s += " " + toHexStr(arg.as8.at2);
+    }
+    if(bytes >= 3) {
+        s += " " + toHexStr(arg.as8.at3);
+    }
+
     return s;
 }
 
@@ -237,11 +248,11 @@ std::string Instruction::stringify() const {
     if(bytes() > 1) { //this instruction takes more than one byte. there is an argument
         AddressingMode mode = opCodeAddressingMode[m_OpCode];
         switch(mode) {
-        
-            default:
-                s += " " + toHexStr(m_Argument, size()-1) + " (unknown mode)";
+
+        default:
+            s += " " + toHexStr(m_Argument, size() - 1) + " (unknown mode)";
         }
     }
-    
+
     return s;
 }
