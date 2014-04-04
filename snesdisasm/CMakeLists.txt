@@ -2,7 +2,7 @@ project(snesdisasm)
 
 set(snesdisasm_src 
     Instructions.cpp
-    flagRegister.cpp
+    FlagRegister.cpp
     Logger.cpp
     SNESROM.cpp
     SNESROMHeader.cpp

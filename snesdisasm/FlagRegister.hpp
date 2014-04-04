@@ -6,7 +6,7 @@
 /**
  * @brief The flagRegisterNames enum contains the names of the processor flags.
  */
-enum flagRegisterNames : unsigned char {
+enum FlagRegisterNames : unsigned char {
     CARRY           = 0x01, //
     ZERO            = 0x02, //
     IRQ             = 0x04, //
@@ -20,7 +20,7 @@ enum flagRegisterNames : unsigned char {
 /**
  * @brief The flagRegister class contains the states of the processorflags of a 65816 procssor.
  */
-class flagRegister {
+class FlagRegister {
   private:
     /**
      * @brief m_flags is a char representing a bitmask representing the processorflags. The names of the bits (flags) are found in the flagRegisterNames enum.
@@ -30,7 +30,7 @@ class flagRegister {
     /**
      * @brief flagRegister creates an instance of flagRegister and sets all flags to zero.
      */
-    flagRegister();
+    FlagRegister();
     /**
      * @brief areFlagsSet checks if all specified processorflags are set.
      * @param flagRegisterName is a bitmask of the flags which will be tested.
