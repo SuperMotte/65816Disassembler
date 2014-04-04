@@ -12,7 +12,7 @@ class Logger {
     std::ofstream mLogStream;
     std::string mLastLog;
 
-    void writeLog(const std::string &message, const std::string &location, const std::string &kindOfMessage);
+    void writeLog(const std::string &kindOfMessage, const std::string &message, const std::string &location);
   public:
     enum class LogType {
         ERROR,

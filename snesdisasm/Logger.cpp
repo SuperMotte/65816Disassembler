@@ -20,27 +20,24 @@ void Logger::closeLog() {
     mLogStream.close();
 }
 
-void Logger::writeLog(const std::string &message, const std::string &location, const std::string &kindOfMessage) {
+void Logger::writeLog(const std::string &kindOfMessage, const std::string &message, const std::string &location) {
     mLastLog = kindOfMessage + message + " IN " + location;
-
-    const std::string::size_type size = mLastLog.size();
-
     mLogStream << mLastLog << std::endl;
 }
 
 void Logger::log(Logger::LogType type, const string &message, const string &location) {
     switch(type) {
     case Logger::LogType::ERROR:
-        writeLog(message, location, "FEHLER : ");
+        writeLog("FEHLER : ", message, location);
         break;
     case Logger::LogType::STATE:
-        writeLog(message, location, "STATUS : ");
+        writeLog("STATUS : ", message, location);
         break;
     case Logger::LogType::WARNING:
-        writeLog(message , location, "WARNUNG: ");
+        writeLog("WARNUNG: ", message , location);
         break;
     case Logger::LogType::HINT:
-        writeLog(message , location, "HINWEIS: ");
+        writeLog("HINWEIS: ", message , location);
         break;
     case Logger::LogType::MESSAGE:
         mLogStream << message << std::endl;
