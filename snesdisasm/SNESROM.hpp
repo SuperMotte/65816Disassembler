@@ -15,10 +15,15 @@ class SNESROM {
     bool  m_hasSMCHeader;           //contains information of the ROM-Image data containing a SMC-header
     bool  m_isLoROM;                //true if the image is from a LoROM or false otherwise
     SNESROMHeader m_SNESROMHeader;  //the header of the SNES ROM
+
+    //prevent copying a rom
+    SNESROM(const SNESROM &other) = delete;
+    SNESROM &operator=(const SNESROM &other) = delete;
   public:
     typedef SNESROMHeader::Address Address;
 
     SNESROM(const std::string &ROMImagePath);
+    SNESROM(SNESROM &&other);
     ~SNESROM();
 
     void overwriteLoROMHiROM(bool isLoROM);
@@ -29,9 +34,9 @@ class SNESROM {
     void copyBytes(uint8_t *destination, Address ROMAddress, size_t numberOfBytesToCopy) const;
 
     /**
-     * @brief Returns the byte at a given address
+     * @brief Returns a ptr to the byte at a given address
      */
-    Instruction operator[](Address rom_address) const;
+    uint8_t *operator[](Address rom_address) const;
     const SNESROMHeader &header() const;
 };
 

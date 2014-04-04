@@ -14,32 +14,19 @@
  *
  */
 
-#ifndef DISASM_H
-#define DISASM_H
+#ifndef CPUSTATE_HPP
+#define CPUSTATE_HPP
 
-#include "SNESROM.hpp"
-#include "Instructions.hpp"
-#include "CPUState.hpp"
+#include "FlagRegister.hpp"
 
-#include <vector>
+/*! \brief This class represents a incomplete cpu state that controls parsing
+ */
+class CPUState {
+  private:
+  public:
+    FlagRegister flagRegister;
 
-class Disasm
-{    
-public:
-    struct Section{
-        SNESROM::Address start;
-        SNESROM::Address end;
-        
-        std::vector<Instruction> instructions;
-    };
-private:
-    SNESROM m_Rom;
-    CPUState m_State;
-public:
-    Disasm(SNESROM && rom);
-    const SNESROM& rom();
-    
-    Section disasmUntilJump(SNESROM::Address start, unsigned int max_instructions = 30) const;
+    CPUState();
 };
 
-#endif // DISASM_H
+#endif // CPUSTATE_HPP

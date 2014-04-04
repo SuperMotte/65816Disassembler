@@ -36,7 +36,7 @@ class FlagRegister {
      * @param flagRegisterName is a bitmask of the flags which will be tested.
      * @return true if the processorflag is set and false otherwise.
      */
-    bool areFlagsSet(unsigned char flagRegisterNamesBitmask);
+    bool areFlagsSet(unsigned char flagRegisterNamesBitmask) const;
     /**
      * @brief setFlagRegister sets some specific processorflag to true.
      * @param flagRegisterName is a bitmask with all the flags which will be set.

@@ -7,6 +7,7 @@ set(snesdisasm_src
     SNESROM.cpp
     SNESROMHeader.cpp
     Disasm.cpp
+    CPUState.cpp
 )
 
 set(snesdisasm_VERSION_MAJOR 0)

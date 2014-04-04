@@ -8,7 +8,7 @@ FlagRegister::FlagRegister() {
     m_flags = 0x00;
 }
 
-bool FlagRegister::areFlagsSet(unsigned char flagRegisterNamesBitmask) {
+bool FlagRegister::areFlagsSet(unsigned char flagRegisterNamesBitmask) const {
     return (m_flags & flagRegisterNamesBitmask) == flagRegisterNamesBitmask;
 }
 
