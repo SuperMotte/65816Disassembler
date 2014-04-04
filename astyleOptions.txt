@@ -1,0 +1,34 @@
+--style=google
+
+#einrueckung sind 4 spaces
+--indent=spaces=4
+
+#namespace A    namespace A{
+#{            ->};
+#};
+--attach-namespaces
+
+#class A      class A{
+#{         -> };
+#};
+--attach-classes
+
+# a+a+a => a + a + a
+--pad-oper
+
+# ( ( (a) ) ) => (((a)))
+--unpad-paren
+
+# char* foo -> char *foo
+--align-pointer=name
+
+#if(bla)          if(bla){
+#    do();     =>    do();
+#                 }
+--add-brackets
+
+# if(a)           if(a)
+# >   do();   => ....do();
+--convert-tabs
+
+--recursive
