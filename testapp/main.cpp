@@ -19,7 +19,7 @@ int main() {
 
     for(const Instruction &ins : section.mInstructions) {
         std::cout << std::hex << pos << ": \t" << ins.stringify() << std::endl;
-        pos += ins.bytes();
+        pos += ins.size();
     }
 
     return 0;

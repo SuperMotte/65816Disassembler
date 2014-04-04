@@ -245,7 +245,7 @@ std::string toHexStr(const Instruction::Argument_t &arg, uint8_t bytes) {
 
 std::string Instruction::stringify() const {
     std::string s(opCodes[m_OpCode]);
-    if(bytes() > 1) { //this instruction takes more than one byte. there is an argument
+    if(size() > 1) { //this instruction takes more than one byte. there is an argument
         AddressingMode mode = opCodeAddressingMode[m_OpCode];
         switch(mode) {
 

@@ -33,7 +33,7 @@ Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max
     for(unsigned int i = 0; i < max_instructions; ++i) {
         Instruction inst = (*mRom)[pos];
         section.mInstructions.push_back(inst);
-        pos += inst.bytes();
+        pos += inst.size();
 
         if(inst.isJump()) {
             break;
