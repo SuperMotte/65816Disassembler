@@ -155,47 +155,47 @@ AddressingMode opCodeAddressingMode[256] = {
     /*0xF0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X
 };
 
-Instruction::Instruction(uint8_t *data)
+Instruction::Instruction(const CPUState &state, uint8_t *data)
     : m_OpCode {data[0]} {
-    if(size() > 1) {
-        m_Argument.as8.at1 = data[1];
+
+    m_Size = opCodeByteSize[m_OpCode];
+
+    if(state.flagRegister.areFlagsSet(MEMORY_SELECT)) {
+        switch(m_OpCode) {
+        case 0x09:
+        case 0x29:
+        case 0x49:
+        case 0x69:
+        case 0x89:
+        case 0xA9:
+        case 0xC9:
+        case 0xE9:
+            ++m_Size;
+        }
     }
-    if(size() > 2) {
-        m_Argument.as8.at2 = data[2];
+
+    if(state.flagRegister.areFlagsSet(INDEX_SELECT)) {
+        switch(m_OpCode) {
+        case 0xA0:
+        case 0xA2:
+        case 0xC0:
+        case 0xE0:
+            ++m_Size;
+        }
     }
-    if(size() > 3) {
+
+    switch(m_Size) {
+    case 4:
         m_Argument.as8.at3 = data[3];
+    case 3:
+        m_Argument.as8.at2 = data[2];
+    case 2:
+        m_Argument.as8.at1 = data[1];
     }
 }
 
 uint8_t Instruction::size() const {
-    /*
-     //influenced opCodes by the size of register M are 09, 29, 49, 69 (tihihi^^), 89, A9, C9, E9
-            if(registerMIs16Byte) {
-                switch(m_opCode) {
-                case 0x09:
-                case 0x29:
-                case 0x49:
-                case 0x69:
-                case 0x89:
-                case 0xA9:
-                case 0xC9:
-                case 0xE9:
-                    ++size;
-                }
-            }
-            //influenced opCodes by the size of register X are A0, A2, C0, E0
-            if(registerXIs16Byte) {
-                switch(m_opCode) {
-                case 0xA0:
-                case 0xA2:
-                case 0xC0:
-                case 0xE0:
-                    ++size;
-                }
-            }
-    */
-    return opCodeByteSize[m_OpCode];
+    return m_Size;
 }
 
 bool Instruction::isJump() const {

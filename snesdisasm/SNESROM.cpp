@@ -55,6 +55,12 @@ SNESROM::SNESROM(const std::string &ROMImagePath)
     imageDataStream.close();
 }
 
+SNESROM::SNESROM(SNESROM &&other)
+    : m_actualImageData(other.m_actualImageData.release()), m_headerlessImageData(other.m_headerlessImageData),
+      m_hasSMCHeader(other.m_hasSMCHeader), m_isLoROM(other.m_isLoROM), m_SNESROMHeader(std::move(other.m_SNESROMHeader)) {
+    other.m_headerlessImageData = nullptr;
+}
+
 SNESROM::~SNESROM() {
 }
 
@@ -105,9 +111,8 @@ void SNESROM::copyBytes(uint8_t *destination, SNESROM::Address ROMAddress, size_
     }
 }
 
-Instruction SNESROM::operator[](SNESROM::Address rom_address) const {
-    uint8_t *ptr = (uint8_t *)(m_actualImageData.get());
-    return Instruction::fromData(ptr + ROMAddressToImageAddress(rom_address));
+uint8_t *SNESROM::operator[](SNESROM::Address rom_address) const {
+    return (reinterpret_cast<uint8_t *>(m_actualImageData.get()) + ROMAddressToImageAddress(rom_address));
 }
 
 const SNESROMHeader &SNESROM::header() const {

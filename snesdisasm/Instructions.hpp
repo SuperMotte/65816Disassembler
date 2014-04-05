@@ -17,6 +17,8 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
+#include "CPUState.hpp"
+
 #include <cstdint>
 #include <string>
 
@@ -40,13 +42,10 @@ class Instruction {
   private:
     uint8_t m_OpCode;
     Argument_t m_Argument;
-
-    explicit Instruction(uint8_t *data);
+    uint8_t m_Size;
   public:
+    explicit Instruction(const CPUState &state, uint8_t *data);
 
-    static Instruction fromData(uint8_t *data) {
-        return Instruction(data);
-    }
     uint8_t size() const;
 
     bool isJump() const;

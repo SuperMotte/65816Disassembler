@@ -14,32 +14,8 @@
  *
  */
 
-#ifndef DISASM_H
-#define DISASM_H
-
-#include "SNESROM.hpp"
-#include "Instructions.hpp"
 #include "CPUState.hpp"
 
-#include <vector>
+CPUState::CPUState() {
 
-class Disasm
-{    
-public:
-    struct Section{
-        SNESROM::Address start;
-        SNESROM::Address end;
-        
-        std::vector<Instruction> instructions;
-    };
-private:
-    SNESROM m_Rom;
-    CPUState m_State;
-public:
-    Disasm(SNESROM && rom);
-    const SNESROM& rom();
-    
-    Section disasmUntilJump(SNESROM::Address start, unsigned int max_instructions = 30) const;
-};
-
-#endif // DISASM_H
+}

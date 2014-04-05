@@ -18,18 +18,22 @@
 
 #include <iostream>
 
-Disasm::Disasm(SNESROM *rom)
-    : mRom(rom) {
+Disasm::Disasm(SNESROM  &&rom)
+    : m_Rom(std::forward<SNESROM>(rom)) {
+}
+
+const SNESROM &Disasm::rom() {
+    return m_Rom;
 }
 
 Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max_instructions) const {
     Section section;
-    section.mStart = start;
+    section.start = start;
     SNESROM::Address pos = start;
 
     for(unsigned int i = 0; i < max_instructions; ++i) {
-        Instruction inst = (*mRom)[pos];
-        section.mInstructions.push_back(inst);
+        Instruction inst(m_State, m_Rom[pos]);
+        section.instructions.push_back(inst);
         pos += inst.size();
 
         if(inst.isJump()) {
@@ -37,7 +41,7 @@ Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max
         }
     }
 
-    section.mEnd = pos - 1;
+    section.end = pos - 1;
 
     return section;
 }
