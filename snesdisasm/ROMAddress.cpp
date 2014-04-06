@@ -1,42 +1,44 @@
 #include "ROMAddress.hpp"
 #include <assert.h>
 
-ROMAddress::ROMAddress(bool isLoROM) {
-    if(isLoROM)
-        ROMLayout = ROM_LAYOUT::LOROM;
-    else
-        ROMLayout = ROM_LAYOUT::HIROM;
-    ROMBank = 0;
-    bankAddress = 0;
+ROMAddress::ROMAddress(ROM_LAYOUT layout)
+    : m_ROMLayout(layout), m_ROMBank(0), m_bankAddress(0)
+{
+}
+
+ROMAddress::ROMAddress(ROM_LAYOUT layout, ImageAddress imageAddress)
+    : ROMAddress(layout)
+{
+    setROMAddressWithImageOffset(imageAddress);
 }
 
 ROMAddress::~ROMAddress() {
 }
 
-uint32_t ROMAddress::getImageAddress() const {
+ImageAddress ROMAddress::getImageAddress() const {
     uint32_t imageAddress = 0;
-    if(m_isLoROM) {
-        if(ROMBank==0x7E || ROMBank==0x7F) {
-            return -1; //the address is actually a RAM address
+    if(m_ROMLayout == ROM_LAYOUT::LOROM) {
+        if(m_ROMBank==0x7E || m_ROMBank==0x7F) {
+            return ImageAddress(-1); //the address is actually a RAM address
         } else {
             //!TODO: save-RAM (?)
             //it is actually a ROM address
-            imageAddress = (ROMBank & 0x7F)*0x10000/2+bankAddress&0x7FFF;
+            imageAddress = (m_ROMBank & 0x7F)*0x10000/2+m_bankAddress&0x7FFF;
         }
     } else {
         //it is a HiROM address
-        if(ROMBank==0x7E || ROMBank==0x7F) {
-            return -1; //the address is actually a RAM address
+        if(m_ROMBank==0x7E || m_ROMBank==0x7F) {
+            return ImageAddress(-1); //the address is actually a RAM address
         } else {
             //!TODO: save-RAM (?)
             //it is actually a ROM address
-            if((ROMBank & 0x7F) < 0x40) {
+            if((m_ROMBank & 0x7F) < 0x40) {
                 //mirror 3 and 4
-                assert(bankAddress > 0x7FFF);
-                imageAddress = ((ROMBank & 0x7F) + 0xC0)*0x10000+bankAddress;
+                assert(m_bankAddress > 0x7FFF);
+                imageAddress = ((m_ROMBank & 0x7F) + 0xC0)*0x10000+m_bankAddress;
             } else {
                 //mirror 1 and 2
-                imageAddress = ((ROMBank & 0x7F) - 0x40)*0x10000+bankAddress;
+                imageAddress = ((m_ROMBank & 0x7F) - 0x40)*0x10000+m_bankAddress;
             }
         }
     }
@@ -44,47 +46,48 @@ uint32_t ROMAddress::getImageAddress() const {
 
 void ROMAddress::setROMAddress(uint32_t longAddress) {
     assert(longAddress < 0x1000000);
-    ROMBank = longAddress / 0x10000;
-    ROMAddress = longAddress % 0x10000;
+    m_ROMBank = longAddress / 0x10000;
+    m_bankAddress = longAddress % 0x10000;
 }
 
 void ROMAddress::setROMBank(uint8_t ROMBank) {
-    this->ROMBank = ROMBank;
+    m_ROMBank = ROMBank;
 }
 
-void ROMAddress::setROMAddress(uint16_t addressInBank) {
-    ROMAddress = addressInBank;
+void ROMAddress::setInBankAddress(uint16_t addressInBank) {
+    m_bankAddress = addressInBank;
 }
 
 void ROMAddress::setPageID(uint8_t pageID) {
-    pageNumber = pageID;
+    m_pageNumber = pageID;
 }
 
-void ROMAddress::setROMAddress(uint8_t addressInPage) {
-    pageOffset = addressInPage;
+void ROMAddress::setInPageAddress(uint8_t addressInPage) {
+    m_pageOffset = addressInPage;
 }
 
-void ROMAddress::setROMAddressWithImageOffset(uint32_t imageOffset) {
-    switch(ROM_LAYOUT){
+void ROMAddress::setROMAddressWithImageOffset(ImageAddress imageOffset) {
+    switch(m_ROMLayout){
     case ROM_LAYOUT::LOROM:
         assert(imageOffset > 0x3FFFFF);
-        ROMBank = imageOffset / 0x8000;
-        ROMAddress = 0x8000 + (imageOffset & 0x7FFF);
+        m_ROMBank = imageOffset / 0x8000;
+        m_bankAddress = 0x8000 + (imageOffset & 0x7FFF);
         if(imageOffset > 0x3EFFFF) {
             //we have to use the second mirror because otherwise we would refer to system RAM
-            ROMBank += 0x80;
+            m_ROMBank += 0x80;
         }
     break;
     case ROM_LAYOUT::HIROM:
         //it is a HiROM
         assert(imageOffset > 0x3FFFFF);
-        ROMBank = imageOffset / 0x10000;
-        ROMAddress = imageOffset % 0xFFFF;
+        m_ROMBank = imageOffset / 0x10000;
+        m_bankAddress = imageOffset % 0xFFFF;
         if(imageOffset > 0x3EFFFF) {
             //we have to use the second mirror because otherwise we would refer to system RAM
-            ROMBank += 0x80;
+            m_ROMBank += 0x80;
         }
     break;
     default: //!TODO: throw some errors
+        break;
     }
 }

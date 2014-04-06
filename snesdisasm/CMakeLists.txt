@@ -6,6 +6,7 @@ set(snesdisasm_src
     Logger.cpp
     SNESROM.cpp
     SNESROMHeader.cpp
+    ROMAddress.cpp
     Disasm.cpp
     CPUState.cpp
 )

@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "Helper.hpp"
+
 enum class ROM_LAYOUT {
     LOROM,
     HIROM,
@@ -10,19 +12,21 @@ enum class ROM_LAYOUT {
     EXHIROM
 };
 
+STRONG_TYPEDEF(uint32_t, ImageAddress)
+
 class ROMAddress {
 private:
-    ROM_LAYOUT ROMLayout;
+    ROM_LAYOUT m_ROMLayout;
 
-    uint8_t ROMBank;
+    uint8_t m_ROMBank;
     union {
         struct {
             //stupid little-endian, we had to exchange the order of these two
-            uint8_t pageOffset;
-            uint8_t pageNumber;
+            uint8_t m_pageOffset;
+            uint8_t m_pageNumber;
         };
         struct {
-            uint16_t bankAddress;
+            uint16_t m_bankAddress;
         };
     };
 
@@ -31,7 +35,14 @@ public:
      * \brief ROMAddress creates a ROM default ROM address at 00:0000.
      * \param isLoROM must be true if the address calculations should be like in a LoROM. It's seen as a HiROM otherwise.
      */
-    ROMAddress(bool isLoROM);
+    explicit ROMAddress(ROM_LAYOUT layout);
+
+    /*!
+     * \brief Construct the ROMAddress from a given Image Address
+     * \param imageAddress
+     */
+    explicit ROMAddress(ROM_LAYOUT layout, ImageAddress imageAddress);
+
     /*!
       * \brief a destructor with no specific function besides deallocation.
       */
@@ -41,37 +52,43 @@ public:
      * \brief getImageAddress returns the offset from the beginning of the image data without the SMC header according to the membervariables.
      * \return the address in the image ignoring the SMC header.
      */
-    uint32_t getImageAddress() const;
+    ImageAddress getImageAddress() const;
+
     /*!
-     * \brief setROMAddress sets the member variables so that they match the given address.
+     * \brief sets the member variables so that they match the given address.
      * \param longAddress is the address the object will contain. It is supposed to be a 24 bit integer and an error will occur if it is greater than the max. value a 24 bit integer could contain.
      */
     void setROMAddress(uint32_t longAddress);
+
     /*!
-     * \brief setROMBank sets the ROM bank for the object.
+     * \brief sets the ROM bank for the object.
      * \param ROMBank is the ID of the ROM bank.
      */
-    void setROMBank(uint8_t ROMBank);
+    void setROMBank(uint8_t m_ROMBank);
+
     /*!
-     * \brief setROMAddress sets the address for data in a specific ROM bank.
+     * \brief sets the address for data in a specific ROM bank.
      * \param addressInBank is the address in a specific bank.
      */
-    void setROMAddress(uint16_t addressInBank);
+    void setInBankAddress(uint16_t addressInBank);
+
     /*!
-     * \brief setPageID sets the ID of a page from a given parameter.
+     * \brief sets the ID of a page from a given parameter.
      * \param pageID the new pageID.
      */
     void setPageID(uint8_t pageID);
+
     /*!
-     * \brief setROMAddress sets the address for data in a specific page.
+     * \brief sets the address for data in a specific page.
      * \param addressInPage is the address in a specific page.
      */
-    void setROMAddress(uint8_t addressInPage);
+    void setInPageAddress(uint8_t addressInPage);
+
     /*!
-     * \brief setROMAddressWithImageOffset calculates the ROM address from a given image offset.
+     * \brief calculates the ROM address from a given image offset.
      * \param imageOffset is the offset in the image from which the class evaluates it's ROM address.
      */
-    void setROMAddressWithImageOffset(uint32_t imageOffset);
+    void setROMAddressWithImageOffset(ImageAddress imageOffset);
 };
 
 #endif // ROMADDRESS_HPP

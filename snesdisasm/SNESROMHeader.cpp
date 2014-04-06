@@ -44,7 +44,6 @@ void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) {
     swap(lhs.mHeaderData, rhs.mHeaderData);
 }
 
-
 std::string SNESROMHeader::getROMName() const {
     return std::string(mHeaderData->m_ROMName, mHeaderData->m_ROMName + 20);
 }
