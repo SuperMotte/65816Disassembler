@@ -26,7 +26,7 @@ SNESROMHeader::SNESROMHeader(const SNESROMHeader &other)
     memcpy(static_cast<void *>(mHeaderData.get()), static_cast<void *>(other.mHeaderData.get()), sizeof(*mHeaderData.get()));
 }
 
-SNESROMHeader::SNESROMHeader(SNESROMHeader &&other)
+SNESROMHeader::SNESROMHeader(SNESROMHeader &&other) noexcept
     : mHeaderData(other.mHeaderData.release()) {
 }
 
@@ -40,12 +40,12 @@ const SNESROMHeader &SNESROMHeader::operator=(const SNESROMHeader &other) {
     return *this;
 }
 
-const SNESROMHeader &SNESROMHeader::operator=(SNESROMHeader && other) {
+const SNESROMHeader &SNESROMHeader::operator=(SNESROMHeader && other) noexcept{
     swap(*this, other);
     return *this;
 }
 
-void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) {
+void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) noexcept{
     using namespace std;
     swap(lhs.mHeaderData, rhs.mHeaderData);
 }

@@ -128,7 +128,7 @@ class SNESROMHeader {
     /**
      * @brief Move constructs from other. other becomes invalid
      */
-    SNESROMHeader(SNESROMHeader &&other);
+    SNESROMHeader(SNESROMHeader &&other) noexcept;
 
     /**
      * @brief Copy constructs from other. This will duplicate the internal state.
@@ -142,9 +142,9 @@ class SNESROMHeader {
 
     const SNESROMHeader &operator=(const SNESROMHeader &other);
 
-    const SNESROMHeader &operator=(SNESROMHeader && other);
+    const SNESROMHeader &operator=(SNESROMHeader && other) noexcept;
 
-    friend void swap(SNESROMHeader &lhs, SNESROMHeader &rhs);
+    friend void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) noexcept;
 
     /**
      * @brief getROMName creates a copy of the ROMName.
