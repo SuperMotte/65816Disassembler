@@ -117,6 +117,15 @@ class SNESROMHeader {
     explicit SNESROMHeader(const char *headerData);
 
     /**
+     * @brief tries to find the header
+     * @param headerData the position to look for the header
+     * @return true if it is found there
+     */
+    static bool isThere(const char *headerData);
+
+    operator bool() const { return mHeaderData.get() != nullptr; }
+
+    /**
      * @brief Move constructs from other. other becomes invalid
      */
     SNESROMHeader(SNESROMHeader &&other);
@@ -174,6 +183,7 @@ class SNESROMHeader {
      */
     Address getInterruptDest(NativeIV vector) const;
     Address getInterruptDest(EmulationIV vector) const;
+
 };
 
 #endif // SNESROMHEADER_HPP

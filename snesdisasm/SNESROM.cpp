@@ -4,7 +4,7 @@
 #include <assert.h>
 
 SNESROM::SNESROM(const std::string &ROMImagePath)
-    : m_actualImageData(nullptr), m_headerlessImageData(nullptr) {
+    : m_actualImageData(nullptr), m_headerlessImageData(nullptr), m_isLoROM(false) {
     std::ifstream imageDataStream(ROMImagePath, std::ifstream::in | std::ifstream::binary);
 
     if(!imageDataStream.is_open()) {
@@ -19,45 +19,71 @@ SNESROM::SNESROM(const std::string &ROMImagePath)
 
     m_actualImageData = std::unique_ptr<char[]>(new char[ROMDataSize]);
     imageDataStream.read(m_actualImageData.get(), ROMDataSize);
+    imageDataStream.close();
 
     assert(ROMDataSize % 512 == 0);
 
-    m_hasSMCHeader = (ROMDataSize % 1024 != 0);
     m_headerlessImageData = m_actualImageData.get() + ROMDataSize % 1024;
 
-    if(m_hasSMCHeader) {
+    //this implies a SMC header
+    if(ROMDataSize % 1024 != 0){
+        m_SMCHeader.load(reinterpret_cast<uint8_t*>(m_actualImageData.get()));
         LOG_SRC(STATE, "ROM has a SMC-Header");
-        if(m_actualImageData[2] == 0x00) {
-            m_isLoROM = true;
-        } else {
-            if(m_actualImageData[2] == 0x30) {
+
+        //since we have a SMC header, we ask it for lo/hi-rom status
+        //not that this might be faulty so we gonna ignore that anyway
+        m_isLoROM = m_SMCHeader.isLoROM();
+
+        //now that we know what rom-type it is, we can use that to find the header
+        ImageAddress headerAddress = ROMAddressToImageAddress(0xFFC0);
+
+        //it is there. nice
+        if(SNESROMHeader::isThere(m_actualImageData.get() + headerAddress)){
+           m_SNESROMHeader = SNESROMHeader(m_actualImageData.get() + headerAddress);
+        }else{
+            LOG_SRC(WARNING, "SMC-Header lies about ROM layout");
+        }
+    }
+
+    if(!m_SNESROMHeader){
+        //not loaded. no clue where it could be. we probe for it
+        if(m_SMCHeader){
+            if(SNESROMHeader::isThere(m_actualImageData.get() + 0x81c0)){
+                //headerless lorom
+                m_isLoROM = true;
+            }else if(SNESROMHeader::isThere(m_headerlessImageData + 0x101c0)){
+                //headerless hirom
                 m_isLoROM = false;
-            } else {
-                LOG_SRC(ERROR, "Unbekanntes ROM Layout im SMC-Header --- "
-                        "http://romhack.wikia.com/wiki/SMC_header#Super_Magicom_.2A.smc");
+            }else{
+                LOG_SRC(ERROR, "There is no SNES header");
+            }
+        }else{
+            if(SNESROMHeader::isThere(m_actualImageData.get() + 0x7fc0)){
+                //headered lorom
+                m_isLoROM = true;
+            }else if(SNESROMHeader::isThere(m_headerlessImageData + 0xffc0)){
+                //headered hirom
+                m_isLoROM = false;
+            }else{
+                LOG_SRC(ERROR, "There is no SNES header");
             }
         }
-    } else {
-        LOG_SRC(STATE, "ROM has no SMC-Header");
+
+        ImageAddress headerAddress = ROMAddressToImageAddress(0xFFC0);
+        m_SNESROMHeader = SNESROMHeader(m_actualImageData.get() + headerAddress);
+
+        if(m_SNESROMHeader){
+            LOG_SRC(STATE, "found SNES header by probing.");
+        }else{
+            LOG_SRC(ERROR, "could not find any SNES header!");
+        }
     }
-
-    if(m_isLoROM) {
-        LOG_SRC(STATE, "LoROM");
-    } else {
-        LOG_SRC(STATE, "HiROM");
-    }
-
-    auto headerStartAddress = ROMAddressToImageAddress(0xFFC0);
-    m_SNESROMHeader = SNESROMHeader(m_actualImageData.get() + headerStartAddress);
-
-    LOG_SRC(STATE, "Detected ROM name: " + m_SNESROMHeader.getROMName());
-
-    imageDataStream.close();
 }
 
 SNESROM::SNESROM(SNESROM &&other)
     : m_actualImageData(other.m_actualImageData.release()), m_headerlessImageData(other.m_headerlessImageData),
-      m_hasSMCHeader(other.m_hasSMCHeader), m_isLoROM(other.m_isLoROM), m_SNESROMHeader(std::move(other.m_SNESROMHeader)) {
+      m_isLoROM(other.m_isLoROM), m_SNESROMHeader(std::move(other.m_SNESROMHeader)),
+      m_SMCHeader(std::move(other.m_SMCHeader)){
     other.m_headerlessImageData = nullptr;
 }
 
@@ -84,14 +110,14 @@ int SNESROM::imageAddressToROMAddress(int imageAddress) const {
         //it is a HiROM
         ROMAddress = 0xC00000 + imageAddress;
     }
-    if(m_hasSMCHeader) {
+    if(m_SMCHeader) {
         ROMAddress -= 512;
     }
     return ROMAddress;
 }
 
-int SNESROM::ROMAddressToImageAddress(int ROMAddress) const {
-    int imageAddress;
+ImageAddress SNESROM::ROMAddressToImageAddress(int ROMAddress) const {
+    ImageAddress imageAddress;
     if(m_isLoROM) {
         int bankID = ROMAddress / 0x10000;
         imageAddress = bankID * 0x8000 + ROMAddress & 0xFFFF - 0x8000;
@@ -99,7 +125,7 @@ int SNESROM::ROMAddressToImageAddress(int ROMAddress) const {
         //it is a HiROM
         imageAddress = ROMAddress & 0x3FFFFF;
     }
-    if(m_hasSMCHeader) {
+    if(m_SMCHeader) {
         imageAddress += 512;
     }
     return imageAddress;

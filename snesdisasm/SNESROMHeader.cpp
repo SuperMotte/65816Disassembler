@@ -9,10 +9,16 @@ SNESROMHeader::SNESROMHeader()
 
 SNESROMHeader::SNESROMHeader(const char *headerData)
     : mHeaderData(new HeaderData) {
-    memcpy(static_cast<void *>(mHeaderData.get()), headerData, sizeof(HeaderData));
 
-    assert(mHeaderData->m_ROMLayout & 0x20); //bit 0x20 is always set in the ROM layout
-    assert(mHeaderData->m_countryCode < 0x0E);//country codes ranging from 0x0E to 0xFF are invalid
+    assert(isThere(headerData));
+    memcpy(static_cast<void *>(mHeaderData.get()), headerData, sizeof(HeaderData));
+}
+
+bool SNESROMHeader::isThere(const char *headerData)
+{
+    //bit 0x20 is always set in the ROM layout
+    //country codes ranging from 0x0E to 0xFF are invalid
+    return (headerData[21] & 0x20) && (headerData[25] < 0x0E);
 }
 
 SNESROMHeader::SNESROMHeader(const SNESROMHeader &other)
