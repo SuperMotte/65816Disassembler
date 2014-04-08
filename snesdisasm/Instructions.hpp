@@ -44,7 +44,7 @@ class Instruction {
     Argument_t m_Argument;
     uint8_t m_Size;
   public:
-    explicit Instruction(const CPUState &state, uint8_t *data);
+    explicit Instruction(const CPUState &state, const uint8_t *data);
 
     uint8_t size() const;
 

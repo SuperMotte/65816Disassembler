@@ -114,14 +114,14 @@ class SNESROMHeader {
      * @brief SNESROMHeader creates an instance of SNESROMHeader with the data pointed at headerData.
      * @param headerData is a pointer to the beginning of the memory containing the SNES header.
      */
-    explicit SNESROMHeader(const char *headerData);
+    explicit SNESROMHeader(uint8_t *headerData);
 
     /**
      * @brief tries to find the header
      * @param headerData the position to look for the header
      * @return true if it is found there
      */
-    static bool isThere(const char *headerData);
+    static bool isThere(const uint8_t *headerData);
 
     operator bool() const { return mHeaderData.get() != nullptr; }
 
