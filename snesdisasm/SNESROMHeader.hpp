@@ -8,8 +8,10 @@
 #include <memory>
 #include "ROMAddress.hpp"
 
+#include "ROMAddress.hpp"
+
 /**
- * @brief The colorTransmissionSystem enum has the two possibilities: NTSC and PAL, both can be found in SNES ROMs but not together.
+ * \brief The colorTransmissionSystem enum has the two possibilities: NTSC and PAL, both can be found in SNES ROMs but not together.
  */
 enum colorTransmissionSystem {
     NTSC,
@@ -17,7 +19,7 @@ enum colorTransmissionSystem {
 };
 
 /**
- * @brief This class ontains names for possible interrupt vectors for the native mode.
+ * \brief This class ontains names for possible interrupt vectors for the native mode.
  */
 class NativeIV {
   private:
@@ -26,7 +28,7 @@ class NativeIV {
   public:
     explicit operator unsigned int() const {
         return idx;
-    };
+    }
     constexpr static unsigned int count = 6;
     static NativeIV COP() {
         return NativeIV(0);
@@ -49,7 +51,7 @@ class NativeIV {
 };
 
 /**
- * @brief This class contains names for possible interrupt vectors for the emulation mode.
+ * \brief This class contains names for possible interrupt vectors for the emulation mode.
  */
 class EmulationIV {
   private:
@@ -58,7 +60,7 @@ class EmulationIV {
   public:
     explicit operator unsigned int() const {
         return idx;
-    };
+    }
     constexpr static unsigned int count = 6;
     static EmulationIV COP() {
         return EmulationIV(0);
@@ -87,95 +89,105 @@ class SNESROMHeader {
   public:
     typedef unsigned int size_type;
     typedef uint16_t Address;
-
   private:
-    //romhack.wikia.com/wiki/SNES_header
-    struct HeaderData { //this is a POD
-        uint8_t m_ROMName[21];                 //21 chars representing the name of the ROM, filled with spaces for padding
-        uint8_t m_ROMLayout;
-        uint8_t m_cartridgeType;
-        uint8_t m_ROMSize;                     //2^m_ROMSize kilobytes, the size of the ROM on the cartridge
-        uint8_t m_RAMSize;                     //2^m_RAMSize kilobytes, the size of the RAM on the cartridge (EXCLUDING the RAM on the SNES system)
-        uint8_t m_countryCode;                 //0x00, 0x01, 0x0D for NTSC, 0x02 - 0x0C for PAL. everything else is invalid
-        uint8_t m_licenseCode;
-        uint8_t m_versionNumber;
-        uint16_t m_checkSumComplement;
-        uint16_t m_SNESCheckSum;
-        uint32_t m_unknownData;                 //the use of this is unknown
-        Address m_nativeInterruptVectors[NativeIV::count];
-        uint32_t m_unknownData2;                //the use of this is unknown
-        Address m_emulationInterruptVectors[EmulationIV::count];
-    };
+    static constexpr uint8_t m_ROMNameIndex = 0;
+    static constexpr uint8_t m_ROMNameLength = 21;
+    static constexpr uint8_t m_ROMLayoutIndex = 21;
+    static constexpr uint8_t m_CartridgeTypeIndex = 22;
+    static constexpr uint8_t m_ROMSizeIndex = 23;
+    static constexpr uint8_t m_RAMSizeIndex = 24;
+    static constexpr uint8_t m_CountryCodeIndex = 25;
+    static constexpr uint8_t m_LocenseCodeIndex = 26;
+    static constexpr uint8_t m_VersionNumber = 27;
+    static constexpr uint8_t m_CheckSumComplementIndex = 28;
+    static constexpr uint8_t m_SNESCheckSumIndex = 30;
+    static constexpr uint8_t m_NativeInterruptVectorIndex = 36;
+    static constexpr uint8_t m_EmulationInterruptVectorIndex = 52;
 
-    std::unique_ptr<HeaderData> mHeaderData;
+    /*! \brief A pointer to the header start. It is non-owning.
+     *
+     * \todo maybe we should convert it to a shared_ptr or weak_ptr
+     */
+    const uint8_t *m_HeaderData;
+
+    //prevent copies
+    SNESROMHeader(const SNESROMHeader &other) = delete;
+    const SNESROMHeader &operator=(const SNESROMHeader &other) = delete;
   public:
-    /**
-     * @brief Creates an invalid header
+    /*!
+     * \brief Creates an invalid header
      */
     explicit SNESROMHeader();
 
-    /**
-     * @brief SNESROMHeader creates an instance of SNESROMHeader with the data pointed at headerData.
-     * @param headerData is a pointer to the beginning of the memory containing the SNES header.
+    /*!
+     * \brief SNESROMHeader creates an instance of SNESROMHeader with the data pointed at headerData.
+     * \param headerData is a pointer to the beginning of the memory containing the SNES header.
      */
-    explicit SNESROMHeader(const char *headerData);
+    explicit SNESROMHeader(const uint8_t *headerData);
 
-    /**
-     * @brief Move constructs from other. other becomes invalid
+    /*!
+     * \brief tries to find the header
+     * \param headerData the position to look for the header
+     * \return true if it is found there
      */
-    SNESROMHeader(SNESROMHeader &&other);
+    static bool isThere(const uint8_t *headerData);
 
-    /**
-     * @brief Copy constructs from other. This will duplicate the internal state.
+    /*!
+     * \brief Returns true if m_HeaderData is set
      */
-    SNESROMHeader(const SNESROMHeader &other);
+    operator bool() const { return m_HeaderData != nullptr; }
 
-    /**
-     * @brief Deletes the header
+    /*!
+     * \brief Move constructs from other. other becomes invalid
+     */
+    SNESROMHeader(SNESROMHeader &&other) noexcept;
+
+    /*!
+     * \brief Deletes the header
      */
     ~SNESROMHeader();
 
-    const SNESROMHeader &operator=(const SNESROMHeader &other);
-
-    const SNESROMHeader &operator=(SNESROMHeader && other);
-
-    friend void swap(SNESROMHeader &lhs, SNESROMHeader &rhs);
+    /*!
+     * \brief Move assigns the header.
+     */
+    const SNESROMHeader &operator=(SNESROMHeader && other) noexcept;
 
     /**
-     * @brief getROMName creates a copy of the ROMName.
-     * @return a copy of the ROMName.
+     * \brief getROMName creates a copy of the ROMName.
+     * \return a copy of the ROMName.
      */
     std::string getROMName() const;
 
     /**
-     * @brief isLoROM checks the header information about the ROM being a Lo- or a HiROM.
-     * @return true if the ROM is according to it's SNES header is LoROM and false if the ROM is HiROM according to the SNES header information.
+     * \brief isLoROM checks the header information about the ROM being a Lo- or a HiROM.
+     * \return true if the ROM is according to it's SNES header is LoROM and false if the ROM is HiROM according to the SNES header information.
      */
     bool isLoROM() const;
     /**
-     * @brief isFastROM checks the header information about the ROM being a fast ROM.
-     * @return true if the ROM is according to it's SNES header a fast ROM.
+     * \brief isFastROM checks the header information about the ROM being a fast ROM.
+     * \return true if the ROM is according to it's SNES header a fast ROM.
      */
     bool isFastROM() const;
     /**
-     * @brief getROMSize returns the size of the ROM according to the SNES header in bytes.
-     * @return the size of the ROM in bytes.
+     * \brief getROMSize returns the size of the ROM according to the SNES header in bytes.
+     * \return the size of the ROM in bytes.
      */
     size_type getROMSize() const;
     /**
-     * @brief getRAMSize returns the size of the RAM according to the SNES header in bytes.
-     * @return the size of the RAM in bytes.
+     * \brief getRAMSize returns the size of the RAM according to the SNES header in bytes.
+     * \return the size of the RAM in bytes.
      */
     int getRAMSize() const;
     /**
-     * @brief getColorTransmissionSystem checks the color transmission system by reading the country code.
-     * @return NTSC or PAL depending on the country code. This are symbolic integers found in the colorTransmissionSystem enum.
+     * \brief getColorTransmissionSystem checks the color transmission system by reading the country code.
+     * \return NTSC or PAL depending on the country code. This are symbolic integers found in the colorTransmissionSystem enum.
      */
     int getColorTransmissionSystem() const;
 
     /**
-     * @brief returns the address of the given interupt entry
+     * \brief returns the address of the given interupt entry
      */
+
     ROMAddress getInterruptDest(NativeIV vector) const;
     ROMAddress getInterruptDest(EmulationIV vector) const;
 };

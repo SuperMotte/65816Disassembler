@@ -3,12 +3,12 @@
 #einrueckung sind 4 spaces
 --indent=spaces=4
 
-#namespace A    namespace A{
+#namespace A    namespace A {
 #{            ->};
 #};
 --attach-namespaces
 
-#class A      class A{
+#class A      class A {
 #{         -> };
 #};
 --attach-classes
@@ -22,7 +22,7 @@
 # char* foo -> char *foo
 --align-pointer=name
 
-#if(bla)          if(bla){
+#if(bla)          if(bla) {
 #    do();     =>    do();
 #                 }
 --add-brackets

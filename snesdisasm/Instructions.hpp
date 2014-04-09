@@ -22,6 +22,14 @@
 #include <cstdint>
 #include <string>
 
+/*! \brief A fetched instruction
+ *
+ *  This class contains a fetched instruction including its arguments.
+ *
+ *  \todo maybe it is sufficient to store a pointer to the instruction in memory and its size.
+ *        The lifetime of each instruction would then depend on the lifetime of the ROM. An it
+ *        would be impossible to copy a rom since it would invalidate all those pointers.
+ */
 class Instruction {
   public:
     typedef uint16_t Address;
@@ -44,12 +52,28 @@ class Instruction {
     Argument_t m_Argument;
     uint8_t m_Size;
   public:
-    explicit Instruction(const CPUState &state, uint8_t *data);
+    /*! \brief Fetches a instruction from the bytes pointed at by data. It uses the given \see CPUState.
+     */
+    explicit Instruction(const CPUState &state, const uint8_t *data);
 
+    /*! \brief Returns the size of the Instruction in bytes. This includes the arguments.
+     *
+     * Thus, the next instruction starts Instruction::size() bytes after this one in ROM memory.
+     */
     uint8_t size() const;
 
+    /*! \brief Returns true if the instruction is a jump i.e. if the next instruction to
+     *         execute may not be the next instruction in ROM memory.
+     *
+     *  This includes (unconditional) jumps, calls, returns and branches.
+     */
     bool isJump() const;
 
+    /*! \brief Returns a string representation if the instruction
+     *
+     *  This method is mainly for debugging purpose and the string representation of each instruction
+     *  may be subject to heavy modifications during developmen. It is therefore not suitable for parsing.
+     */
     std::string stringify() const;
 };
 

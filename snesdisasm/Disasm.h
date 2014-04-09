@@ -22,24 +22,58 @@
 #include "CPUState.hpp"
 
 #include <vector>
+#include <memory>
 
+/*! \brief The disassembler class.
+ *
+ *  This class consumes a \see SNESROM and offers the interface to generate sequences of
+ *  instructions from the binary data.
+ */
 class Disasm
 {    
 public:
+    /*! \brief A sequence of instructions
+     *
+     *  \todo Add better interface to this type. It is still possible to invalidate the invarance if start and
+     *        end to point at the correct bytes.
+     */
     struct Section{
-        SNESROM::Address start;
-        SNESROM::Address end;
+        /*! \brief The first byte of the first instruction within the sequence
+         */
+        ROMAddress start;
+
+        /*! \brief The first byte after the last instruction within the sequence
+         */
+        ROMAddress end;
         
+        /*! \brief The vector of instructions contained within the sequence
+         */
         std::vector<Instruction> instructions;
     };
 private:
     SNESROM m_Rom;
     CPUState m_State;
 public:
+    /*! \brief Constructs disassembler. This constructor will take ownership of the given rom.
+     *  \param rom the rom to disassemble
+     */
     Disasm(SNESROM && rom);
+
+    /*! \brief Returns a reference to the stored rom.
+     *
+     * \todo this might be a leak of internal state. we should better provide the needed interface directly in Disasm
+     */
     const SNESROM& rom();
     
-    Section disasmUntilJump(SNESROM::Address start, unsigned int max_instructions = 30) const;
+    /*! \brief Constructs a \see Section starting at start
+     *
+     *  This method will fetch consectuive instructions beginning at start until it reaches a maximum instruction limit
+     *  or until it encounters a jump instruction (branches, conditional jumps and the like).
+     *
+     *  \param start the address to start disassembling at
+     *  \param max_instructions the maximum number of instructions to fetch
+     */
+    Section disasmUntilJump(ROMAddress start, unsigned int max_instructions = 30) const;
 };
 
 #endif // DISASM_H

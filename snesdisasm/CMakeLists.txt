@@ -6,8 +6,10 @@ set(snesdisasm_src
     Logger.cpp
     SNESROM.cpp
     SNESROMHeader.cpp
+    ROMAddress.cpp
     Disasm.cpp
     CPUState.cpp
+    SMCHeader.cpp
 )
 
 set(snesdisasm_VERSION_MAJOR 0)

@@ -19,7 +19,7 @@
 
 #include "FlagRegister.hpp"
 
-/*! \brief This class represents a incomplete cpu state that controls parsing
+/*! \brief This class represents an incomplete cpu state that controls parsing
  */
 class CPUState {
   private:

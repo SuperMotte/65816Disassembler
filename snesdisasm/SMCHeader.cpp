@@ -14,34 +14,4 @@
  *
  */
 
-#include "Disasm.h"
-
-#include <iostream>
-
-Disasm::Disasm(SNESROM  &&rom)
-    : m_Rom(std::forward<SNESROM>(rom)) {
-}
-
-const SNESROM &Disasm::rom() {
-    return m_Rom;
-}
-
-Disasm::Section Disasm::disasmUntilJump(ROMAddress start, unsigned int max_instructions) const {
-    Section section;
-    section.start = start;
-    ROMAddress pos = start;
-
-    for(unsigned int i = 0; i < max_instructions; ++i) {
-        Instruction inst(m_State, m_Rom[pos]);
-        section.instructions.push_back(inst);
-        pos += inst.size();
-
-        if(inst.isJump()) {
-            break;
-        }
-    }
-
-    section.end = pos;
-
-    return section;
-}
+#include "SMCHeader.hpp"
