@@ -109,7 +109,7 @@ void SNESROM::overwriteLoROMHiROM(bool isLoROM) {
 
 int SNESROM::imageAddressToROMAddress(ImageAddress imageAddress) const {
     int ROMAddress;
-    if(m_hasSMCHeader) {
+    if(m_SMCHeader) {
         ROMAddress -= 512;
     }
 
@@ -124,13 +124,10 @@ int SNESROM::imageAddressToROMAddress(ImageAddress imageAddress) const {
         //it is a HiROM
         ROMAddress = 0xC00000 + imageAddress;
     }
-<<<<<<< HEAD
 
-=======
     if(m_SMCHeader) {
         ROMAddress -= 512;
     }
->>>>>>> origin/master
     return ROMAddress;
 }
 
@@ -155,13 +152,8 @@ void SNESROM::copyBytes(uint8_t *destination, SNESROM::Address ROMAddress, size_
     }
 }
 
-<<<<<<< HEAD
-uint8_t *SNESROM::operator[](SNESROM::Address romAddress) const {
-    return (reinterpret_cast<uint8_t *>(m_actualImageData.get()) + ROMAddressToImageAddress(romAddress));
-=======
 const uint8_t *SNESROM::operator[](SNESROM::Address rom_address) const {
     return &m_actualImageData[ROMAddressToImageAddress(rom_address)];
->>>>>>> origin/master
 }
 
 const SNESROMHeader &SNESROM::header() const {

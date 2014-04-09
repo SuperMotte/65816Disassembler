@@ -40,11 +40,8 @@ class SNESROM {
     /**
      * \brief Returns a ptr to the byte at a given address
      */
-<<<<<<< HEAD
-    uint8_t *operator[](Address romAddress) const;
-=======
     const uint8_t *operator[](Address rom_address) const;
->>>>>>> origin/master
+
     const SNESROMHeader &header() const;
 };
 
