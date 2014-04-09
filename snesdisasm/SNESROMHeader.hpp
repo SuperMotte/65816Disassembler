@@ -1,9 +1,12 @@
 #ifndef SNESROMHEADER_HPP
 #define SNESROMHEADER_HPP
 
+//romhack.wikia.com/wiki/SNES_header
+
 #include <cstdint> // fixed sized integers
 #include <string>
 #include <memory>
+#include "ROMAddress.hpp"
 
 /**
  * @brief The colorTransmissionSystem enum has the two possibilities: NTSC and PAL, both can be found in SNES ROMs but not together.
@@ -86,13 +89,14 @@ class SNESROMHeader {
     typedef uint16_t Address;
 
   private:
+    //romhack.wikia.com/wiki/SNES_header
     struct HeaderData { //this is a POD
         uint8_t m_ROMName[21];                 //21 chars representing the name of the ROM, filled with spaces for padding
         uint8_t m_ROMLayout;
         uint8_t m_cartridgeType;
         uint8_t m_ROMSize;                     //2^m_ROMSize kilobytes, the size of the ROM on the cartridge
         uint8_t m_RAMSize;                     //2^m_RAMSize kilobytes, the size of the RAM on the cartridge (EXCLUDING the RAM on the SNES system)
-        uint8_t m_countryCode;
+        uint8_t m_countryCode;                 //0x00, 0x01, 0x0D for NTSC, 0x02 - 0x0C for PAL. everything else is invalid
         uint8_t m_licenseCode;
         uint8_t m_versionNumber;
         uint16_t m_checkSumComplement;
@@ -172,8 +176,8 @@ class SNESROMHeader {
     /**
      * @brief returns the address of the given interupt entry
      */
-    Address getInterruptDest(NativeIV vector) const;
-    Address getInterruptDest(EmulationIV vector) const;
+    ROMAddress getInterruptDest(NativeIV vector) const;
+    ROMAddress getInterruptDest(EmulationIV vector) const;
 };
 
 #endif // SNESROMHEADER_HPP

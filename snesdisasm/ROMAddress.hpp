@@ -33,6 +33,13 @@ public:
      */
     ROMAddress(bool isLoROM);
     /*!
+     * \brief ROMAddress creates a ROM default ROM address at 00:0000.
+     * \param isLoROM must be true if the address calculations should be like in a LoROM. It's seen as a HiROM otherwise.
+       \param bankID the ID of the bank.
+       \param bankAddress the address in a bank.
+     */
+    ROMAddress(bool isLoROM, uint8_t bankID, uint16_t bankAddress);
+    /*!
       * \brief a destructor with no specific function besides deallocation.
       */
     ~ROMAddress();

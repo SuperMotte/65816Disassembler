@@ -10,6 +10,15 @@ ROMAddress::ROMAddress(bool isLoROM) {
     bankAddress = 0;
 }
 
+ROMAddress::ROMAddress(bool isLoROM, uint8_t bankID, uint16_t bankAddress) {
+    if(isLoROM)
+        ROMLayout = ROM_LAYOUT::LOROM;
+    else
+        ROMLayout = ROM_LAYOUT::HIROM;
+    ROMBank = bankID;
+    this->bankAddress = bankAddress;
+}
+
 ROMAddress::~ROMAddress() {
 }
 

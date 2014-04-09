@@ -44,7 +44,6 @@ void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) {
     swap(lhs.mHeaderData, rhs.mHeaderData);
 }
 
-
 std::string SNESROMHeader::getROMName() const {
     return std::string(mHeaderData->m_ROMName, mHeaderData->m_ROMName + 20);
 }
@@ -89,10 +88,10 @@ int SNESROMHeader::getColorTransmissionSystem() const {
     }
 }
 
-SNESROMHeader::Address SNESROMHeader::getInterruptDest(NativeIV vector) const {
-    return mHeaderData->m_nativeInterruptVectors[static_cast<unsigned int>(vector)];
+ROMAddress SNESROMHeader::getInterruptDest(NativeIV vector) const {
+    return ROMAddress(isLoROM(), 0x00, mHeaderData->m_nativeInterruptVectors[static_cast<unsigned int>(vector)]);
 }
 
-SNESROMHeader::Address SNESROMHeader::getInterruptDest(EmulationIV vector) const {
-    return mHeaderData->m_emulationInterruptVectors[static_cast<unsigned int>(vector)];
+ROMAddress SNESROMHeader::getInterruptDest(EmulationIV vector) const {
+    return ROMAddress(isLoROM(), 0x00, mHeaderData->m_emulationInterruptVectors[static_cast<unsigned int>(vector)]);
 }
