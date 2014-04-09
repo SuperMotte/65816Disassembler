@@ -73,6 +73,10 @@ void SNESROM::overwriteLoROMHiROM(bool isLoROM) {
 
 int SNESROM::imageAddressToROMAddress(int imageAddress) const {
     int ROMAddress;
+    if(m_hasSMCHeader) {
+        ROMAddress -= 512;
+    }
+
     if(m_isLoROM) {
         int bankID = imageAddress / 0x8000;
         //map to the second mirror if needed
@@ -84,9 +88,7 @@ int SNESROM::imageAddressToROMAddress(int imageAddress) const {
         //it is a HiROM
         ROMAddress = 0xC00000 + imageAddress;
     }
-    if(m_hasSMCHeader) {
-        ROMAddress -= 512;
-    }
+
     return ROMAddress;
 }
 
@@ -111,8 +113,8 @@ void SNESROM::copyBytes(uint8_t *destination, SNESROM::Address ROMAddress, size_
     }
 }
 
-uint8_t *SNESROM::operator[](SNESROM::Address rom_address) const {
-    return (reinterpret_cast<uint8_t *>(m_actualImageData.get()) + ROMAddressToImageAddress(rom_address));
+uint8_t *SNESROM::operator[](SNESROM::Address romAddress) const {
+    return (reinterpret_cast<uint8_t *>(m_actualImageData.get()) + ROMAddressToImageAddress(romAddress));
 }
 
 const SNESROMHeader &SNESROM::header() const {

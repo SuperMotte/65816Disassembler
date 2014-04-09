@@ -22,7 +22,7 @@ class Logger {
         MESSAGE
     };
 
-    Logger(const std::string &logPath = "Verlauf.log");
+    explicit Logger(const std::string &logPath = "Verlauf.log");
     ~Logger();
     static Logger &Instance(); // returns a signleton reference
 
