@@ -3,69 +3,53 @@
 #include <cstring> //memset, and the like
 
 SNESROMHeader::SNESROMHeader()
-    : mHeaderData(nullptr) {
+    : m_HeaderData(nullptr) {
 
 }
 
 SNESROMHeader::SNESROMHeader(uint8_t *headerData)
-    : mHeaderData(new HeaderData) {
+    : m_HeaderData(headerData) {
 
     assert(isThere(headerData));
-    memcpy(static_cast<void *>(mHeaderData.get()), headerData, sizeof(HeaderData));
 }
 
 bool SNESROMHeader::isThere(const uint8_t *headerData)
 {
     //bit 0x20 is always set in the ROM layout
     //country codes ranging from 0x0E to 0xFF are invalid
-    return (headerData[21] & 0x20) && (headerData[25] < 0x0E);
-}
-
-SNESROMHeader::SNESROMHeader(const SNESROMHeader &other)
-    : mHeaderData(new HeaderData) {
-    memcpy(static_cast<void *>(mHeaderData.get()), static_cast<void *>(other.mHeaderData.get()), sizeof(*mHeaderData.get()));
+    return (headerData[m_ROMLayoutIndex] & 0x20) &&
+           (headerData[m_CountryCodeIndex] < 0x0E);
 }
 
 SNESROMHeader::SNESROMHeader(SNESROMHeader &&other) noexcept
-    : mHeaderData(other.mHeaderData.release()) {
+    : m_HeaderData(other.m_HeaderData) {
+    other.m_HeaderData = nullptr;
 }
 
 SNESROMHeader::~SNESROMHeader() {
 }
 
-const SNESROMHeader &SNESROMHeader::operator=(const SNESROMHeader &other) {
-    SNESROMHeader header(other);
-
-    swap(*this, header);
-    return *this;
-}
-
 const SNESROMHeader &SNESROMHeader::operator=(SNESROMHeader && other) noexcept{
-    swap(*this, other);
-    return *this;
-}
-
-void swap(SNESROMHeader &lhs, SNESROMHeader &rhs) noexcept{
-    using namespace std;
-    swap(lhs.mHeaderData, rhs.mHeaderData);
+    m_HeaderData = other.m_HeaderData;
+    other.m_HeaderData = nullptr;
 }
 
 std::string SNESROMHeader::getROMName() const {
-    return std::string(mHeaderData->m_ROMName, mHeaderData->m_ROMName + 20);
+    return std::string(m_HeaderData + m_ROMNameIndex, m_HeaderData + m_ROMNameIndex + m_ROMNameLength);
 }
 
 bool SNESROMHeader::isLoROM() const {
-    return (mHeaderData->m_ROMLayout & 0x01) != 0x01;
+    return (m_HeaderData[m_ROMLayoutIndex] & 0x01) != 0x01;
 }
 
 bool SNESROMHeader::isFastROM() const {
-    return (mHeaderData->m_ROMLayout & 0x10);
+    return (m_HeaderData[m_ROMLayoutIndex] & 0x10);
 }
 
 SNESROMHeader::size_type SNESROMHeader::getROMSize() const {
     SNESROMHeader::size_type size = 1024;
 
-    for(uint8_t i = 0; i < mHeaderData->m_ROMSize; ++i) {
+    for(uint8_t i = 0; i < m_HeaderData[m_ROMSizeIndex]; ++i) {
         size *= 2;
     }
 
@@ -73,11 +57,11 @@ SNESROMHeader::size_type SNESROMHeader::getROMSize() const {
 }
 
 int SNESROMHeader::getRAMSize() const {
-    if(mHeaderData->m_ROMSize == 0) {
+    if(m_HeaderData[m_ROMSizeIndex] == 0) {
         return 0;
     } else {
         size_type ROMSize = 2048;
-        for(uint8_t i = 1; i < mHeaderData->m_ROMSize; ++i) {
+        for(uint8_t i = 1; i <  m_HeaderData[m_ROMSizeIndex]; ++i) {
             ROMSize *= 2;
         }
         return ROMSize;
@@ -85,9 +69,9 @@ int SNESROMHeader::getRAMSize() const {
 }
 
 int SNESROMHeader::getColorTransmissionSystem() const {
-    if(mHeaderData->m_countryCode <= 0x01) {
+    if(m_HeaderData[m_CountryCodeIndex] <= 0x01) {
         return NTSC;
-    } else if(mHeaderData->m_countryCode <= 0x0C) {
+    } else if(m_HeaderData[m_CountryCodeIndex] <= 0x0C) {
         return PAL;
     } else {
         return NTSC;
@@ -95,9 +79,16 @@ int SNESROMHeader::getColorTransmissionSystem() const {
 }
 
 SNESROMHeader::Address SNESROMHeader::getInterruptDest(NativeIV vector) const {
-    return mHeaderData->m_nativeInterruptVectors[static_cast<unsigned int>(vector)];
+    SNESROMHeader::Address addr = 0;
+    addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
+         | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
+    return addr;
+    return 0;
 }
 
 SNESROMHeader::Address SNESROMHeader::getInterruptDest(EmulationIV vector) const {
-    return mHeaderData->m_emulationInterruptVectors[static_cast<unsigned int>(vector)];
+    SNESROMHeader::Address addr = 0;
+    addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
+         | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
+    return addr;
 }

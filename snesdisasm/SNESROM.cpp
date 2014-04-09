@@ -107,7 +107,7 @@ void SNESROM::overwriteLoROMHiROM(bool isLoROM) {
     }
 }
 
-int SNESROM::imageAddressToROMAddress(int imageAddress) const {
+int SNESROM::imageAddressToROMAddress(ImageAddress imageAddress) const {
     int ROMAddress;
     if(m_isLoROM) {
         int bankID = imageAddress / 0x8000;

@@ -32,7 +32,7 @@ class SNESROM {
 
     void overwriteLoROMHiROM(bool isLoROM);
 
-    int imageAddressToROMAddress(int imageAddress) const;
+    int imageAddressToROMAddress(ImageAddress imageAddress) const;
     ImageAddress ROMAddressToImageAddress(int ROMAddress) const;
 
     void copyBytes(uint8_t *destination, Address ROMAddress, size_t numberOfBytesToCopy) const;
