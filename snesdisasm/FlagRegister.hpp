@@ -4,7 +4,7 @@
 #define NUMBER_OF_REGISTERFLAGS 8
 
 /**
- * @brief The flagRegisterNames enum contains the names of the processor flags.
+ * \brief The flagRegisterNames enum contains the names of the processor flags.
  */
 enum FlagRegisterNames : unsigned char {
     CARRY           = 0x01, //
@@ -18,33 +18,33 @@ enum FlagRegisterNames : unsigned char {
 };
 
 /**
- * @brief The flagRegister class contains the states of the processorflags of a 65816 procssor.
+ * \brief The flagRegister class contains the states of the processorflags of a 65816 procssor.
  */
 class FlagRegister {
   private:
     /**
-     * @brief m_flags is a char representing a bitmask representing the processorflags. The names of the bits (flags) are found in the flagRegisterNames enum.
+     * \brief m_flags is a char representing a bitmask representing the processorflags. The names of the bits (flags) are found in the flagRegisterNames enum.
      */
     unsigned char m_flags;
   public:
     /**
-     * @brief flagRegister creates an instance of flagRegister and sets all flags to zero.
+     * \brief flagRegister creates an instance of flagRegister and sets all flags to zero.
      */
     FlagRegister();
     /**
-     * @brief areFlagsSet checks if all specified processorflags are set.
-     * @param flagRegisterName is a bitmask of the flags which will be tested.
-     * @return true if the processorflag is set and false otherwise.
+     * \brief areFlagsSet checks if all specified processorflags are set.
+     * \param flagRegisterName is a bitmask of the flags which will be tested.
+     * \return true if the processorflag is set and false otherwise.
      */
     bool areFlagsSet(unsigned char flagRegisterNamesBitmask) const;
     /**
-     * @brief setFlagRegister sets some specific processorflag to true.
-     * @param flagRegisterName is a bitmask with all the flags which will be set.
+     * \brief setFlagRegister sets some specific processorflag to true.
+     * \param flagRegisterName is a bitmask with all the flags which will be set.
      */
     void setFlagRegister(unsigned char flagRegisterNamesBitmask);
     /**
-     * @brief setFlagRegister sets some specific processorflag to false.
-     * @param flagRegisterName is a bitmask with all the flags which will be reset.
+     * \brief setFlagRegister sets some specific processorflag to false.
+     * \param flagRegisterName is a bitmask with all the flags which will be reset.
      */
     void resetFlagRegister(unsigned char flagRegisterNamesBitmask);
 };

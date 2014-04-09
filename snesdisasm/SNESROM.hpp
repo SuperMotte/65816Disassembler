@@ -38,7 +38,7 @@ class SNESROM {
     void copyBytes(uint8_t *destination, Address ROMAddress, size_t numberOfBytesToCopy) const;
 
     /**
-     * @brief Returns a ptr to the byte at a given address
+     * \brief Returns a ptr to the byte at a given address
      */
     const uint8_t *operator[](Address rom_address) const;
     const SNESROMHeader &header() const;

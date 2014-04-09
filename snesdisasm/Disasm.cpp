@@ -41,7 +41,7 @@ Disasm::Section Disasm::disasmUntilJump(SNESROM::Address start, unsigned int max
         }
     }
 
-    section.end = pos - 1;
+    section.end = pos;
 
     return section;
 }
