@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef DISASM_H
-#define DISASM_H
+#ifndef DISASM_HPP
+#define DISASM_HPP
 
 #include "SNESROM.hpp"
 #include "Instructions.hpp"
@@ -76,4 +76,4 @@ public:
     Section disasmUntilJump(ROMAddress start, unsigned int max_instructions = 30) const;
 };
 
-#endif // DISASM_H
+#endif // DISASM_HPP

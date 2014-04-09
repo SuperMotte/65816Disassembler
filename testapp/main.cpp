@@ -3,7 +3,7 @@
 #include "snesdisasm/snesdisasmConfig.hpp"
 #include "snesdisasm/Logger.hpp"
 #include "snesdisasm/SNESROM.hpp"
-#include "snesdisasm/Disasm.h"
+#include "snesdisasm/Disasm.hpp"
 
 
 using namespace std;
