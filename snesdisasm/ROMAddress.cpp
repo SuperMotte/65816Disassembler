@@ -126,3 +126,11 @@ void ROMAddress::setROMAddressWithImageOffset(ImageAddress imageOffset) {
         break;
     }
 }
+
+std::ostream& operator<<(std::ostream &stream, const ROMAddress &addr) {
+    auto flags = cout.flags();
+    //so the address gets shown as big-endian no matter if the system is little-, middle- or big-endian
+    stream << std::hex << bank << ":" << page << pageAddress;
+    cout.flags(flags);
+    return stream;
+}

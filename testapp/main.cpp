@@ -1,12 +1,16 @@
 #include <iostream>
 
+#include "snesdisasm/globals.h"
 #include "snesdisasm/snesdisasmConfig.hpp"
 #include "snesdisasm/Logger.hpp"
 #include "snesdisasm/SNESROM.hpp"
 #include "snesdisasm/Disasm.h"
+
+
 using namespace std;
 
 int main() {
+    testEndian();
     cout << "Testapp using libsnesdisasm version: " << snesdisasm::version_string << endl;
 
     //setup the disassembler from the rom
