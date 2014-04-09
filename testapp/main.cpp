@@ -1,6 +1,5 @@
 #include <iostream>
 
-#include "snesdisasm/globals.h"
 #include "snesdisasm/snesdisasmConfig.hpp"
 #include "snesdisasm/Logger.hpp"
 #include "snesdisasm/SNESROM.hpp"
@@ -10,7 +9,6 @@
 using namespace std;
 
 int main() {
-    testEndian();
     cout << "Testapp using libsnesdisasm version: " << snesdisasm::version_string << endl;
 
     //setup the disassembler from the rom
@@ -24,7 +22,7 @@ int main() {
 
     //print out all found instructions
     for(const Instruction &ins : section.instructions) {
-        std::cout << std::hex << pos << ": \t" << ins.stringify() << std::endl;
+        std::cout << pos << ": \t" << ins.stringify() << std::endl;
         pos += ins.size();
     }
 

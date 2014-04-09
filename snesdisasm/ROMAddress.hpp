@@ -4,8 +4,9 @@
 //romhack.wikia.com/wiki/SNES_ROM_layout
 
 #include <cstdint>
-#include "globals.h"
+#include <iosfwd>
 #include "Helper.hpp"
+
 
 enum class ROM_LAYOUT {
     LOROM,
@@ -104,10 +105,10 @@ public:
      */
     void setROMAddressWithImageOffset(ImageAddress imageOffset);
 
-    uint8_t bank() const { return (systemIsLittleEndian ? m_Address & 0xFF00 >> 8 : m_Address & 0xFF0000) >> 16; }
-    uint16_t bankAddress() const { return systemIsLittleEndian ? m_Address & 0xFFFF0000 >> 16 : m_Address & 0x00FFFF; }
-    uint8_t page() const { return (systemIsLittleEndian ? m_Address & 0xFF0000 >> 16 : m_Address & 0x00FF00) >> 8; }
-    uint8_t pageAddress() const { return systemIsLittleEndian ? m_Address & 0xFF000000 >> 24 : m_Address & 0x0000FF; }
+    uint8_t bank() const { return (m_Address & 0xFF0000) >> 16; }
+    uint16_t bankAddress() const { return m_Address & 0x00FFFF; }
+    uint8_t page() const { return (m_Address & 0x00FF00) >> 8; }
+    uint8_t pageAddress() const { return m_Address & 0x0000FF; }
 
     /*!
      * \brief operator<< prints the address in big-endian with colon between the bank and the address in the bank.

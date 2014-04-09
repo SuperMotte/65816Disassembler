@@ -34,17 +34,14 @@ class Instruction {
   public:
     typedef uint16_t Address;
 
-    union Argument_t {
-        struct {
-            uint8_t at1;
-            uint8_t at2;
-            uint8_t at3;
-        } as8;
+    //be aware that arguments are in litte-endian and should be converted whenn passing
+    //them through the public interface of Instruction
+    struct Argument_t {
+        uint8_t at1;
+        uint8_t at2;
+        uint8_t at3;
 
-        struct {
-            uint16_t at1;
-            uint8_t at2;
-        } as16_8;
+        Argument_t(): at1(0), at2(0), at3(0) {}
     };
 
   private:

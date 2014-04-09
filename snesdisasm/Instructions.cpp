@@ -186,11 +186,11 @@ Instruction::Instruction(const CPUState &state, const uint8_t *data)
 
     switch(m_Size) {
     case 4:
-        m_Argument.as8.at3 = data[3];
+        m_Argument.at3 = data[3];
     case 3:
-        m_Argument.as8.at2 = data[2];
+        m_Argument.at2 = data[2];
     case 2:
-        m_Argument.as8.at1 = data[1];
+        m_Argument.at1 = data[1];
     }
 }
 
@@ -228,13 +228,13 @@ std::string toHexStr(const Instruction::Argument_t &arg, uint8_t bytes) {
     std::string s;
 
     if(bytes >= 1) {
-        s += toHexStr(arg.as8.at1);
+        s += toHexStr(arg.at1);
     }
     if(bytes >= 2) {
-        s += " " + toHexStr(arg.as8.at2);
+        s += " " + toHexStr(arg.at2);
     }
     if(bytes >= 3) {
-        s += " " + toHexStr(arg.as8.at3);
+        s += " " + toHexStr(arg.at3);
     }
 
     return s;

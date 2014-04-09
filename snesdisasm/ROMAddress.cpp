@@ -1,5 +1,7 @@
 #include "ROMAddress.hpp"
 #include <assert.h>
+#include <iostream>
+#include <iomanip>
 
 ROMAddress::ROMAddress()
     : ROMAddress(ROM_LAYOUT::LOROM)
@@ -128,9 +130,9 @@ void ROMAddress::setROMAddressWithImageOffset(ImageAddress imageOffset) {
 }
 
 std::ostream& operator<<(std::ostream &stream, const ROMAddress &addr) {
-    auto flags = cout.flags();
+    auto flags = stream.flags(std::ios_base::hex);
     //so the address gets shown as big-endian no matter if the system is little-, middle- or big-endian
-    stream << std::hex << bank << ":" << page << pageAddress;
-    cout.flags(flags);
+    stream << std::setfill('0') << std::setw(2) << static_cast<uint16_t>(addr.bank()) << ":" << std::setw(4) << addr.bankAddress();
+    stream.flags(flags);
     return stream;
 }
