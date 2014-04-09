@@ -7,7 +7,7 @@ SNESROMHeader::SNESROMHeader()
 
 }
 
-SNESROMHeader::SNESROMHeader(uint8_t *headerData)
+SNESROMHeader::SNESROMHeader(const uint8_t *headerData)
     : m_HeaderData(headerData) {
 
     assert(isThere(headerData));
@@ -78,17 +78,16 @@ int SNESROMHeader::getColorTransmissionSystem() const {
     }
 }
 
-SNESROMHeader::Address SNESROMHeader::getInterruptDest(NativeIV vector) const {
-    SNESROMHeader::Address addr = 0;
-    addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
-         | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
-    return addr;
-    return 0;
+ROMAddress SNESROMHeader::getInterruptDest(NativeIV vector) const {
+    uint16_t addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
+                  | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
+
+    return ROMAddress(isLoROM(), 0x00, addr);
 }
 
-SNESROMHeader::Address SNESROMHeader::getInterruptDest(EmulationIV vector) const {
-    SNESROMHeader::Address addr = 0;
-    addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
-         | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
-    return addr;
+ROMAddress SNESROMHeader::getInterruptDest(EmulationIV vector) const {
+    uint16_t addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
+                  | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
+
+    return ROMAddress(isLoROM(), 0x00, addr);
 }

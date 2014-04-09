@@ -1,9 +1,12 @@
 #ifndef SNESROMHEADER_HPP
 #define SNESROMHEADER_HPP
 
+//romhack.wikia.com/wiki/SNES_header
+
 #include <cstdint> // fixed sized integers
 #include <string>
 #include <memory>
+#include "ROMAddress.hpp"
 
 #include "ROMAddress.hpp"
 
@@ -120,7 +123,7 @@ class SNESROMHeader {
      * \brief SNESROMHeader creates an instance of SNESROMHeader with the data pointed at headerData.
      * \param headerData is a pointer to the beginning of the memory containing the SNES header.
      */
-    explicit SNESROMHeader(uint8_t *headerData);
+    explicit SNESROMHeader(const uint8_t *headerData);
 
     /*!
      * \brief tries to find the header
@@ -184,12 +187,9 @@ class SNESROMHeader {
     /**
      * \brief returns the address of the given interupt entry
      */
-    Address getInterruptDest(NativeIV vector) const;
 
-    /**
-     * \brief returns the address of the given interupt entry
-     */
-    Address getInterruptDest(EmulationIV vector) const;
+    ROMAddress getInterruptDest(NativeIV vector) const;
+    ROMAddress getInterruptDest(EmulationIV vector) const;
 };
 
 #endif // SNESROMHEADER_HPP

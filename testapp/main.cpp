@@ -13,7 +13,7 @@ int main() {
     Disasm disasm(SNESROM("TERRA.SMC"));
 
     //get the roms entry point
-    auto pos = disasm.rom().header().getInterruptDest(EmulationIV::RESET());
+    ROMAddress pos = disasm.rom().header().getInterruptDest(EmulationIV::RESET());
 
     //disassemble until you hit a jump instruction
     Disasm::Section section = disasm.disasmUntilJump(pos);
