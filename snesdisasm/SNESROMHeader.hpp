@@ -2,13 +2,12 @@
 #define SNESROMHEADER_HPP
 
 //romhack.wikia.com/wiki/SNES_header
+#include "ROMAddress.hpp"
 
 #include <cstdint> // fixed sized integers
 #include <string>
 #include <memory>
-#include "ROMAddress.hpp"
 
-#include "ROMAddress.hpp"
 
 /**
  * \brief The colorTransmissionSystem enum has the two possibilities: NTSC and PAL, both can be found in SNES ROMs but not together.
@@ -162,7 +161,8 @@ class SNESROMHeader {
      * \brief isLoROM checks the header information about the ROM being a Lo- or a HiROM.
      * \return true if the ROM is according to it's SNES header is LoROM and false if the ROM is HiROM according to the SNES header information.
      */
-    bool isLoROM() const;
+    RomLayout layout() const;
+
     /**
      * \brief isFastROM checks the header information about the ROM being a fast ROM.
      * \return true if the ROM is according to it's SNES header a fast ROM.

@@ -4,25 +4,18 @@
 #include <iomanip>
 
 ROMAddress::ROMAddress()
-    : ROMAddress(ROM_LAYOUT::LOROM)
 {
 
 }
 
-ROMAddress::ROMAddress(ROM_LAYOUT layout)
-    : m_ROMLayout(layout), m_Address(0)
+ROMAddress::ROMAddress(RomLayout layout, ImageAddress imageAddress)
+    : ROMAddress()
 {
+    fromImageAddress(layout, imageAddress);
 }
 
-ROMAddress::ROMAddress(ROM_LAYOUT layout, ImageAddress imageAddress)
-    : ROMAddress(layout)
-{
-    setROMAddressWithImageOffset(imageAddress);
-}
-
-ROMAddress::ROMAddress(bool isLoROM, uint8_t bankID, uint16_t bankAddress)
-    : m_ROMLayout(isLoROM ? ROM_LAYOUT::LOROM : ROM_LAYOUT::HIROM),
-      m_Address((bankID << 16) | bankAddress){
+ROMAddress::ROMAddress(uint8_t bankID, uint16_t bankAddress)
+    : m_Address((bankID << 16) | bankAddress){
 }
 
 ROMAddress::~ROMAddress() {
@@ -30,25 +23,21 @@ ROMAddress::~ROMAddress() {
 
 void ROMAddress::operator+=(int i)
 {
+    ///\todo this is unsafe. we may end up in wrong spaces
     m_Address += i;
 }
 
-ROMAddress::operator uint32_t() const
-{
-    return m_Address;
-}
+ImageAddress ROMAddress::toImageAddress(RomLayout layout) const {
+    /// \todo: save-RAM (?)
 
-ImageAddress ROMAddress::getImageAddress() const {
     uint32_t imageAddress = 0;
     uint8_t bank = this->bank();
 
-    if(m_ROMLayout == ROM_LAYOUT::LOROM) {
-
+    if(layout.isLoROM()) {
         if(bank == 0x7E || bank == 0x7F) {
             return ImageAddress(-1); //the address is actually a RAM address
         } else {
-            //!TODO: save-RAM (?)
-            //it is actually a ROM address
+            //it is actually a ROM address*/
             imageAddress = (bank & 0x7F)*0x10000/2+bankAddress()&0x7FFF;
         }
     } else {
@@ -58,6 +47,9 @@ ImageAddress ROMAddress::getImageAddress() const {
         } else {
             //!TODO: save-RAM (?)
             //it is actually a ROM address
+
+            imageAddress = m_Address & 0x3FFFFF;
+            /* This is broken. Sry
             if((bank & 0x7F) < 0x40) {
                 //mirror 3 and 4
                 assert(bankAddress() > 0x7FFF);
@@ -65,7 +57,7 @@ ImageAddress ROMAddress::getImageAddress() const {
             } else {
                 //mirror 1 and 2
                 imageAddress = ((bank & 0x7F) - 0x40)*0x10000+bankAddress();
-            }
+            }*/
         }
     }
 
@@ -94,38 +86,27 @@ void ROMAddress::setInPageAddress(uint8_t addressInPage) {
 }
 
 //romhack.wikia.com/wiki/SNES_ROM_layout
-void ROMAddress::setROMAddressWithImageOffset(ImageAddress imageOffset) {
-    assert(imageOffset < 0x400000);
+void ROMAddress::fromImageAddress(RomLayout layout, ImageAddress imageAdress) {
+    assert(imageAdress < 0x400000);
 
-    switch(m_ROMLayout){
-    case ROM_LAYOUT::LOROM:
-    {
-        m_Address = static_cast<uint32_t>(imageOffset);
-
-        uint8_t bank = imageOffset / 0x8000;
-        uint16_t bankAddress = 0x8000 + (imageOffset & 0x7FFF);
-        if(imageOffset > 0x3DFFFF) {
+    if(layout == RomLayout::LoROM()){
+        uint8_t bank = imageAdress / 0x8000;
+        uint16_t bankAddress = 0x8000 + (imageAdress & 0x7FFF);
+        if(imageAdress > 0x3DFFFF) {
             //we have to use the second mirror because otherwise we would refer to system RAM
             bank += 0x80;
         }
         m_Address = (bank << 16) | bankAddress;
-    }
-    break;
-    case ROM_LAYOUT::HIROM:
-    {
-        //it is a HiROM
-
-        uint8_t bank = imageOffset / 0x10000;
-        uint16_t bankAddress = imageOffset % 0xFFFF;
-        if(imageOffset > 0x3DFFFF) {
+    }else if(layout == RomLayout::HiROM()){
+        uint8_t bank = imageAdress / 0x10000;
+        uint16_t bankAddress = imageAdress % 0xFFFF;
+        if(imageAdress > 0x3DFFFF) {
             //we have to use the second mirror because otherwise we would refer to system RAM
             bank += 0x80;
         }
         m_Address = (bank << 16) | bankAddress;
-    }
-    break;
-    default: //!TODO: throw some errors
-        break;
+    }else{
+        //!TODO: throw some errors
     }
 }
 
@@ -134,5 +115,26 @@ std::ostream& operator<<(std::ostream &stream, const ROMAddress &addr) {
     //so the address gets shown as big-endian no matter if the system is little-, middle- or big-endian
     stream << std::setfill('0') << std::setw(2) << static_cast<uint16_t>(addr.bank()) << ":" << std::setw(4) << addr.bankAddress();
     stream.flags(flags);
+    return stream;
+}
+
+
+std::ostream& operator<<(std::ostream &stream, const RomLayout &layout)
+{
+    switch(layout.m_layout){
+    case 0:
+        stream << "LoROM";
+        break;
+    case 1:
+        stream << "HiROM";
+        break;
+    case 2:
+        stream << "ExLoROM (unsupported)";
+        break;
+    case 3:
+        stream << "ExHiROM (unsupported)";
+        break;
+    }
+
     return stream;
 }

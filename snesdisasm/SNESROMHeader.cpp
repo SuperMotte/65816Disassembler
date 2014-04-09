@@ -32,14 +32,15 @@ SNESROMHeader::~SNESROMHeader() {
 const SNESROMHeader &SNESROMHeader::operator=(SNESROMHeader && other) noexcept{
     m_HeaderData = other.m_HeaderData;
     other.m_HeaderData = nullptr;
+    return *this;
 }
 
 std::string SNESROMHeader::getROMName() const {
     return std::string(m_HeaderData + m_ROMNameIndex, m_HeaderData + m_ROMNameIndex + m_ROMNameLength);
 }
 
-bool SNESROMHeader::isLoROM() const {
-    return (m_HeaderData[m_ROMLayoutIndex] & 0x01) != 0x01;
+RomLayout SNESROMHeader::layout() const {
+    return RomLayout::fromByteCode(m_HeaderData[m_ROMLayoutIndex]);
 }
 
 bool SNESROMHeader::isFastROM() const {
@@ -82,12 +83,12 @@ ROMAddress SNESROMHeader::getInterruptDest(NativeIV vector) const {
     uint16_t addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    return ROMAddress(isLoROM(), 0x00, addr);
+    return ROMAddress(0x00, addr);
 }
 
 ROMAddress SNESROMHeader::getInterruptDest(EmulationIV vector) const {
     uint16_t addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    return ROMAddress(isLoROM(), 0x00, addr);
+    return ROMAddress(0x00, addr);
 }

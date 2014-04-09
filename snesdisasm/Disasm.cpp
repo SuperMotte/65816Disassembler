@@ -16,8 +16,6 @@
 
 #include "Disasm.h"
 
-#include <iostream>
-
 Disasm::Disasm(SNESROM  &&rom)
     : m_Rom(std::forward<SNESROM>(rom)) {
 }

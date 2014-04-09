@@ -17,6 +17,8 @@
 #ifndef SMCHEADER_HPP
 #define SMCHEADER_HPP
 
+#include "ROMAddress.hpp"
+
 #include <memory>
 #include <cstdint>
 
@@ -54,8 +56,12 @@ public:
      *
      * Be aware that this information is sometimes incorrect.
      */
-    bool isLoROM(){
-        return m_bytes[2] == 0x00;
+    RomLayout layout(){
+        if(m_bytes[2] == 0x00){
+            return RomLayout::LoROM();
+        }else{
+            return RomLayout::HiROM();
+        }
     }
 
     /*! \brief Converts to true if the smc header is not in its invalid state and false otherwise.
