@@ -30,7 +30,7 @@ class SNESROM {
     ~SNESROM();
 
     void copyBytes(uint8_t *destination, ROMAddress rom_address, size_t numberOfBytesToCopy) const;
-
+    RomLayout checkRomLayout();
     /**
      * \brief Returns a ptr to the byte at a given address
      */

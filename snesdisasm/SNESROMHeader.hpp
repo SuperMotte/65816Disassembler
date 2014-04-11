@@ -129,7 +129,7 @@ class SNESROMHeader {
      * \param headerData the position to look for the header
      * \return true if it is found there
      */
-    static bool isThere(const uint8_t *headerData);
+    static bool mayBeThere(const uint8_t *headerData);
 
     /*!
      * \brief Returns true if m_HeaderData is set

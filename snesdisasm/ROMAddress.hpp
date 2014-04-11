@@ -16,44 +16,23 @@ public:
     static RomLayout HiROM(){ return RomLayout(1); }
     static RomLayout ExLoROM(){ return RomLayout(2);} //this and
     static RomLayout ExHiROM(){ return RomLayout(3);} //this is currently not supported
+    static RomLayout Error(){ return RomLayout(4);}
 
-    bool isLoROM() const { return !(m_layout & 0x1); }
+    bool isLoROM() const { return m_layout == 0; }
     static RomLayout fromByteCode(uint8_t code){ if((code & 0x01) != 0x01) return LoROM(); else return HiROM();}
     bool operator==(const RomLayout& other) const { return m_layout == other.m_layout; }
 
     friend std::ostream& operator<<(std::ostream &stream, const RomLayout &layout);
 };
 
-
 STRONG_TYPEDEF(uint32_t, ImageAddress)
 
 class ROMAddress {
-private:
+protected:
     uint32_t m_Address;
-public:
-    /*!
-     * \brief Default constructs an address pointing at 0x00
-     */
     ROMAddress();
-
-    /*!
-     * \brief Construct the ROMAddress from a given Image Address
-     * \param imageAddress
-     */
-    explicit ROMAddress(RomLayout layout, ImageAddress imageAddress);
-
-    /*!
-     * \brief ROMAddress creates a ROM default ROM address at 00:0000.
-     * \param bankID the ID of the bank.
-     * \param bankAddress the address in a bank.
-     */
     ROMAddress(uint8_t bankID, uint16_t bankAddress);
-
-    /*!
-      * \brief a destructor with no specific function besides deallocation.
-      */
-    ~ROMAddress();
-
+public:
     /*!
      * \brief adds a number of bytes to the address
      */
@@ -63,7 +42,7 @@ public:
      * \brief getImageAddress returns the offset from the beginning of the image data without the SMC header according to the membervariables.
      * \return the address in the image ignoring the SMC header.
      */
-    ImageAddress toImageAddress(RomLayout layout) const;
+    virtual ImageAddress toImageAddress() const;
 
     /*!
      * \brief sets the member variables so that they match the given address.
@@ -81,7 +60,7 @@ public:
      * \brief sets the address for data in a specific ROM bank.
      * \param addressInBank is the address in a specific bank.
      */
-    void setInBankAddress(uint16_t addressInBank);
+    void setBankAddress(uint16_t addressInBank);
 
     /*!
      * \brief sets the ID of a page from a given parameter.
@@ -93,13 +72,14 @@ public:
      * \brief sets the address for data in a specific page.
      * \param addressInPage is the address in a specific page.
      */
-    void setInPageAddress(uint8_t addressInPage);
+    void setPageAddress(uint8_t addressInPage);
 
     /*!
      * \brief calculates the ROM address from a given image offset.
+     * \param layout is the layout of the ROM, should be RomLayout::LoROM() or RomLayout::HiROM().
      * \param imageOffset is the offset in the image from which the class evaluates it's ROM address.
      */
-    void fromImageAddress(RomLayout layout, ImageAddress imageAddress);
+    virtual void fromImageAddress(RomLayout layout, ImageAddress imageAddress);
 
     uint8_t bank() const { return (m_Address & 0xFF0000) >> 16; }
     uint16_t bankAddress() const { return m_Address & 0x00FFFF; }
@@ -114,5 +94,50 @@ public:
      */
     friend std::ostream& operator<<(std::ostream &stream, const ROMAddress &addr);
 };
+
+class LoROMAddress : public ROMAddress {
+public:
+    /*!
+     * \brief Default constructs an address pointing at 00:0000
+     */
+    LoROMAddress();
+    /*!
+     * \brief Construct the LoROMAddress from a given Image Address.
+     * \param imageAddress is the address in an image the object will point to.
+     */
+    explicit LoROMAddress(ImageAddress imageAddress);
+    /*!
+     * \brief LoROMAddress creates an address object at bankID:bankAddress.
+     * \param bankID the ID of the bank.
+     * \param bankAddress the address in a bank.
+     */
+    LoROMAddress(uint8_t bankID, uint16_t bankAddress);
+    virtual ImageAddress toImageAddress() const;
+    virtual void fromImageAddress(ImageAddress imageAddress);
+};
+
+class HiROMAddress : public ROMAddress {
+public:
+    /*!
+     * \brief Default constructs an address pointing at 00:0000
+     */
+    HiROMAddress();
+    /*!
+     * \brief Construct the HiROMAddress from a given Image Address.
+     * \param imageAddress is the address in an image the object will point to.
+     */
+    explicit HiROMAddress(ImageAddress imageAddress);
+    /*!
+     * \brief HiROMAddress creates an address object at bankID:bankAddress.
+     * \param bankID the ID of the bank.
+     * \param bankAddress the address in a bank.
+     */
+    HiROMAddress(uint8_t bankID, uint16_t bankAddress);
+    virtual ImageAddress toImageAddress() const;
+    virtual void fromImageAddress(ImageAddress imageAddress);
+};
+
+
+ROMAddress getROMAddressObject(RomLayout layout);
 
 #endif // ROMADDRESS_HPP

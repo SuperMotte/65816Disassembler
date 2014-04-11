@@ -10,10 +10,10 @@ SNESROMHeader::SNESROMHeader()
 SNESROMHeader::SNESROMHeader(const uint8_t *headerData)
     : m_HeaderData(headerData) {
 
-    assert(isThere(headerData));
+    assert(mayBeThere(headerData));
 }
 
-bool SNESROMHeader::isThere(const uint8_t *headerData)
+bool SNESROMHeader::mayBeThere(const uint8_t *headerData)
 {
     //bit 0x20 is always set in the ROM layout
     //country codes ranging from 0x0E to 0xFF are invalid
@@ -83,12 +83,16 @@ ROMAddress SNESROMHeader::getInterruptDest(NativeIV vector) const {
     uint16_t addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    return ROMAddress(0x00, addr);
+    ROMAddress result = getROMAddressObject(layout());
+    result.setROMAddress(addr);
+    return result;
 }
 
 ROMAddress SNESROMHeader::getInterruptDest(EmulationIV vector) const {
     uint16_t addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    return ROMAddress(0x00, addr);
+    ROMAddress result = getROMAddressObject(layout());
+    result.setROMAddress(addr);
+    return result;
 }
