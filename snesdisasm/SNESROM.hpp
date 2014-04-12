@@ -29,12 +29,12 @@ class SNESROM {
     SNESROM(SNESROM &&other);
     ~SNESROM();
 
-    void copyBytes(uint8_t *destination, ROMAddress rom_address, size_t numberOfBytesToCopy) const;
+    void copyBytes(uint8_t *destination, ROMAddress* rom_address, size_t numberOfBytesToCopy) const;
     RomLayout checkRomLayout();
     /**
      * \brief Returns a ptr to the byte at a given address
      */
-    const uint8_t *operator[](ROMAddress rom_address) const;
+    const uint8_t *operator[](ROMAddress* rom_address) const;
 
     const SNESROMHeader &header() const;
 };

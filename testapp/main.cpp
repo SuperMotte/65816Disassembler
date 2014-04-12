@@ -15,16 +15,18 @@ int main() {
     Disasm disasm(SNESROM("TERRA.SMC"));
 
     //get the roms entry point
-    ROMAddress pos = disasm.rom().header().getInterruptDest(EmulationIV::RESET());
+    ROMAddress* pos = disasm.rom().header().getInterruptDest(EmulationIV::RESET());
 
     //disassemble until you hit a jump instruction
     Disasm::Section section = disasm.disasmUntilJump(pos);
 
     //print out all found instructions
     for(const Instruction &ins : section.instructions) {
-        std::cout << pos << ": \t" << ins.stringify() << std::endl;
-        pos += ins.size();
+        std::cout << *pos << ": \t" << ins.stringify() << std::endl;
+        (*pos) += ins.size();
     }
+
+    delete pos;
 
     return 0;
 }

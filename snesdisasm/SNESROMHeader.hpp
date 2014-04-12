@@ -188,8 +188,8 @@ class SNESROMHeader {
      * \brief returns the address of the given interupt entry
      */
 
-    ROMAddress getInterruptDest(NativeIV vector) const;
-    ROMAddress getInterruptDest(EmulationIV vector) const;
+    ROMAddress* getInterruptDest(NativeIV vector) const;
+    ROMAddress* getInterruptDest(EmulationIV vector) const;
 };
 
 #endif // SNESROMHEADER_HPP

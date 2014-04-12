@@ -66,7 +66,7 @@ void ROMAddress::setPageAddress(uint8_t addressInPage) {
 std::ostream& operator<<(std::ostream &stream, const ROMAddress &addr) {
     auto flags = stream.flags(std::ios_base::hex);
     //so the address gets shown as big-endian no matter if the system is little-, middle- or big-endian
-    stream << std::setfill('0') << std::setw(2) << static_cast<uint16_t>(addr.bank()) << ":" << std::setw(4) << addr.bankAddress();
+    stream << std::setfill('0') << std::uppercase << std::setw(2) << static_cast<uint16_t>(addr.bank()) << ":" << std::setw(4) << addr.bankAddress();
     stream.flags(flags);
     return stream;
 }
@@ -153,7 +153,7 @@ ImageAddress HiROMAddress::toImageAddress() const {
             //mirrors 3 and 4 are only accepted in the upper half
             assert(bankAddress() > 0x7FFF);
         }
-        imageAddress = (bank & 0x3F)<<16+bankAddress();
+        imageAddress = ((bank & 0x3F)<<16)+bankAddress();
     }
 
     return ImageAddress(imageAddress);
@@ -172,14 +172,12 @@ void HiROMAddress::fromImageAddress(ImageAddress imageAdress) {
     m_Address = (bank << 16) | bankAddress;
 }
 
-
-
-ROMAddress getROMAddressObject(RomLayout layout) {
+ROMAddress* getROMAddressObject(RomLayout layout) {
     if(layout==RomLayout::LoROM()) {
-        return LoROMAddress();
+        return new LoROMAddress();
     }
     if(layout==RomLayout::HiROM()) {
-        return HiROMAddress();
+        return new HiROMAddress();
     }
     //!ToDo Throw exceptions. EXCEPTIONS FOR EVERYONE!!!
 }

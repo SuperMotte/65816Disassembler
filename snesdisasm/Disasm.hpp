@@ -40,11 +40,11 @@ public:
     struct Section{
         /*! \brief The first byte of the first instruction within the sequence
          */
-        ROMAddress start;
+        ROMAddress* start;
 
         /*! \brief The first byte after the last instruction within the sequence
          */
-        ROMAddress end;
+        ROMAddress* end;
         
         /*! \brief The vector of instructions contained within the sequence
          */
@@ -73,7 +73,7 @@ public:
      *  \param start the address to start disassembling at
      *  \param max_instructions the maximum number of instructions to fetch
      */
-    Section disasmUntilJump(ROMAddress start, unsigned int max_instructions = 30) const;
+    Section disasmUntilJump(ROMAddress* start, unsigned int max_instructions = 30) const;
 };
 
 #endif // DISASM_HPP

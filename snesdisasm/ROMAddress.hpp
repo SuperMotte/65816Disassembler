@@ -30,9 +30,9 @@ STRONG_TYPEDEF(uint32_t, ImageAddress)
 class ROMAddress {
 protected:
     uint32_t m_Address;
+public:
     ROMAddress();
     ROMAddress(uint8_t bankID, uint16_t bankAddress);
-public:
     /*!
      * \brief adds a number of bytes to the address
      */
@@ -42,7 +42,7 @@ public:
      * \brief getImageAddress returns the offset from the beginning of the image data without the SMC header according to the membervariables.
      * \return the address in the image ignoring the SMC header.
      */
-    virtual ImageAddress toImageAddress() const;
+    virtual ImageAddress toImageAddress() const = 0;
 
     /*!
      * \brief sets the member variables so that they match the given address.
@@ -79,7 +79,7 @@ public:
      * \param layout is the layout of the ROM, should be RomLayout::LoROM() or RomLayout::HiROM().
      * \param imageOffset is the offset in the image from which the class evaluates it's ROM address.
      */
-    virtual void fromImageAddress(RomLayout layout, ImageAddress imageAddress);
+    virtual void fromImageAddress(ImageAddress imageAddress) = 0;
 
     uint8_t bank() const { return (m_Address & 0xFF0000) >> 16; }
     uint16_t bankAddress() const { return m_Address & 0x00FFFF; }
@@ -112,8 +112,8 @@ public:
      * \param bankAddress the address in a bank.
      */
     LoROMAddress(uint8_t bankID, uint16_t bankAddress);
-    virtual ImageAddress toImageAddress() const;
-    virtual void fromImageAddress(ImageAddress imageAddress);
+    virtual ImageAddress toImageAddress() const override;
+    virtual void fromImageAddress(ImageAddress imageAddress) override;
 };
 
 class HiROMAddress : public ROMAddress {
@@ -133,11 +133,11 @@ public:
      * \param bankAddress the address in a bank.
      */
     HiROMAddress(uint8_t bankID, uint16_t bankAddress);
-    virtual ImageAddress toImageAddress() const;
-    virtual void fromImageAddress(ImageAddress imageAddress);
+    virtual ImageAddress toImageAddress() const override;
+    virtual void fromImageAddress(ImageAddress imageAddress) override;
 };
 
 
-ROMAddress getROMAddressObject(RomLayout layout);
+ROMAddress* getROMAddressObject(RomLayout layout);
 
 #endif // ROMADDRESS_HPP

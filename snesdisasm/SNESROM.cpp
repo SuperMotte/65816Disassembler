@@ -67,9 +67,10 @@ SNESROM::SNESROM(const std::string &ROMImagePath)
         RomLayout layout = m_SMCHeader.layout();
 
         //now that we know what rom-type it is, we can use that to find the header
-        ROMAddress SNESHeaderROMAddress = getROMAddressObject(layout);
-        SNESHeaderROMAddress.setROMAddress(0x00FFC0);
-        ImageAddress headerAddress = SNESHeaderROMAddress.toImageAddress();
+        ROMAddress* SNESHeaderROMAddress = getROMAddressObject(layout);
+        SNESHeaderROMAddress->setROMAddress(0x00FFC0);
+        ImageAddress headerAddress = SNESHeaderROMAddress->toImageAddress();
+        delete SNESHeaderROMAddress;
 
         //it is there. nice
         if(SNESROMHeader::mayBeThere(m_headerlessImageData + headerAddress)){
@@ -107,16 +108,17 @@ SNESROM::SNESROM(SNESROM &&other)
 SNESROM::~SNESROM() {
 }
 
-void SNESROM::copyBytes(uint8_t *destination, ROMAddress rom_address, size_t numberOfBytesToCopy) const {
+void SNESROM::copyBytes(uint8_t *destination, ROMAddress* rom_address, size_t numberOfBytesToCopy) const {
     for(unsigned int i = 0; i < numberOfBytesToCopy; ++i) {
-        destination[i] = m_headerlessImageData[rom_address.toImageAddress()];
+        destination[i] = m_headerlessImageData[rom_address->toImageAddress()];
     }
 }
 
 RomLayout SNESROM::checkRomLayout() {
-    ROMAddress possibleLoROMSNESHeader = LoROMAddress(ImageAddress(0x00FFD5));
-    ROMAddress possibleHiROMSNESHeader = HiROMAddress(ImageAddress(0x00FFD5));
+    LoROMAddress possibleLoROMSNESHeader(ImageAddress(0x00FFD5));
+    HiROMAddress possibleHiROMSNESHeader(ImageAddress(0x00FFD5));
     uint8_t ROMLayoutAccordingToTheSNESHeader = m_headerlessImageData[possibleLoROMSNESHeader.toImageAddress()];
+    RomLayout resultingRomLayout(RomLayout::Error());
     if(ROMLayoutAccordingToTheSNESHeader != 0x20 &&
        ROMLayoutAccordingToTheSNESHeader != 0x30) {
         //it's not a LoROM
@@ -128,16 +130,17 @@ RomLayout SNESROM::checkRomLayout() {
             //!ToDo: find out about ExLoROM and ExHiROM
         } else {
             //since it's not a LoROM but could be a HiROM we assume it must be a HiROM (ignoring ExLoROM and ExHiROM)
-            return RomLayout::HiROM();
+            resultingRomLayout = RomLayout::HiROM();
         }
     } else {
         //it COULD be a LoROM
-        return RomLayout::LoROM();
+        resultingRomLayout = RomLayout::LoROM();
     }
+    return resultingRomLayout;
 }
 
-const uint8_t *SNESROM::operator[](ROMAddress rom_address) const {
-    return &m_headerlessImageData[rom_address.toImageAddress()];
+const uint8_t *SNESROM::operator[](ROMAddress* rom_address) const {
+    return &m_headerlessImageData[rom_address->toImageAddress()];
 }
 
 const SNESROMHeader &SNESROM::header() const {

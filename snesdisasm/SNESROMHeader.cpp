@@ -79,20 +79,20 @@ int SNESROMHeader::getColorTransmissionSystem() const {
     }
 }
 
-ROMAddress SNESROMHeader::getInterruptDest(NativeIV vector) const {
+ROMAddress* SNESROMHeader::getInterruptDest(NativeIV vector) const {
     uint16_t addr = (m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_NativeInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    ROMAddress result = getROMAddressObject(layout());
-    result.setROMAddress(addr);
+    ROMAddress* result = getROMAddressObject(layout());
+    result->setROMAddress(addr);
     return result;
 }
 
-ROMAddress SNESROMHeader::getInterruptDest(EmulationIV vector) const {
+ROMAddress* SNESROMHeader::getInterruptDest(EmulationIV vector) const {
     uint16_t addr = (m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector) + 1] << 8)
                   | m_HeaderData[m_EmulationInterruptVectorIndex + 2*static_cast<unsigned int>(vector)];
 
-    ROMAddress result = getROMAddressObject(layout());
-    result.setROMAddress(addr);
+    ROMAddress* result = getROMAddressObject(layout());
+    result->setROMAddress(addr);
     return result;
 }
