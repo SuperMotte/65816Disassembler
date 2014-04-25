@@ -54,7 +54,7 @@ public:
      * \brief sets the ROM bank for the object.
      * \param ROMBank is the ID of the ROM bank.
      */
-    void setROMBank(uint8_t m_ROMBank);
+    void setROMBank(uint8_t ROMBank);
 
     /*!
      * \brief sets the address for data in a specific ROM bank.

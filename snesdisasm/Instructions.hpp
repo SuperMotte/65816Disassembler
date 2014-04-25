@@ -36,6 +36,7 @@ class Instruction {
 
     //be aware that arguments are in litte-endian and should be converted whenn passing
     //them through the public interface of Instruction
+    //!TODO Think about if this really has to be public :?
     struct Argument_t {
         uint8_t at1;
         uint8_t at2;

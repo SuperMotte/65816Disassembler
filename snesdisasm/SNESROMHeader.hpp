@@ -96,7 +96,7 @@ class SNESROMHeader {
     static constexpr uint8_t m_ROMSizeIndex = 23;
     static constexpr uint8_t m_RAMSizeIndex = 24;
     static constexpr uint8_t m_CountryCodeIndex = 25;
-    static constexpr uint8_t m_LocenseCodeIndex = 26;
+    static constexpr uint8_t m_LicenseCodeIndex = 26;
     static constexpr uint8_t m_VersionNumber = 27;
     static constexpr uint8_t m_CheckSumComplementIndex = 28;
     static constexpr uint8_t m_SNESCheckSumIndex = 30;
@@ -177,12 +177,12 @@ class SNESROMHeader {
      * \brief getRAMSize returns the size of the RAM according to the SNES header in bytes.
      * \return the size of the RAM in bytes.
      */
-    int getRAMSize() const;
+    size_type getRAMSize() const;
     /**
      * \brief getColorTransmissionSystem checks the color transmission system by reading the country code.
      * \return NTSC or PAL depending on the country code. This are symbolic integers found in the colorTransmissionSystem enum.
      */
-    int getColorTransmissionSystem() const;
+    colorTransmissionSystem getColorTransmissionSystem() const;
 
     /**
      * \brief returns the address of the given interupt entry

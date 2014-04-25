@@ -17,20 +17,20 @@
 #include "Disasm.hpp"
 
 Disasm::Disasm(SNESROM  &&rom)
-    : m_Rom(std::forward<SNESROM>(rom)) {
+    : m_ROM(std::forward<SNESROM>(rom)) {
 }
 
 const SNESROM &Disasm::rom() {
-    return m_Rom;
+    return m_ROM;
 }
 
-Disasm::Section Disasm::disasmUntilJump(ROMAddress* start, unsigned int max_instructions) const {
+Disasm::Section Disasm::disasmUntilJump(ROMAddress* start, unsigned int maxInstructions) const {
     Section section;
     section.start = start;
     ROMAddress* pos = start;
 
-    for(unsigned int i = 0; i < max_instructions; ++i) {
-        Instruction inst(m_State, m_Rom[pos]);
+    for(unsigned int i = 0; i < maxInstructions; ++i) {
+        Instruction inst(m_State, m_ROM[pos]);
         section.instructions.push_back(inst);
         (*pos) += inst.size();
 

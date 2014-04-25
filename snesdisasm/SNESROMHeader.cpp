@@ -57,7 +57,7 @@ SNESROMHeader::size_type SNESROMHeader::getROMSize() const {
     return size;
 }
 
-int SNESROMHeader::getRAMSize() const {
+SNESROMHeader::size_type SNESROMHeader::getRAMSize() const {
     if(m_HeaderData[m_ROMSizeIndex] == 0) {
         return 0;
     } else {
@@ -69,7 +69,7 @@ int SNESROMHeader::getRAMSize() const {
     }
 }
 
-int SNESROMHeader::getColorTransmissionSystem() const {
+colorTransmissionSystem SNESROMHeader::getColorTransmissionSystem() const {
     if(m_HeaderData[m_CountryCodeIndex] <= 0x01) {
         return NTSC;
     } else if(m_HeaderData[m_CountryCodeIndex] <= 0x0C) {

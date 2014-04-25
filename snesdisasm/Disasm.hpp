@@ -51,7 +51,7 @@ public:
         std::vector<Instruction> instructions;
     };
 private:
-    SNESROM m_Rom;
+    SNESROM m_ROM;
     CPUState m_State;
 public:
     /*! \brief Constructs disassembler. This constructor will take ownership of the given rom.
@@ -73,7 +73,7 @@ public:
      *  \param start the address to start disassembling at
      *  \param max_instructions the maximum number of instructions to fetch
      */
-    Section disasmUntilJump(ROMAddress* start, unsigned int max_instructions = 30) const;
+    Section disasmUntilJump(ROMAddress* start, unsigned int maxInstructions = 30) const;
 };
 
 #endif // DISASM_HPP
