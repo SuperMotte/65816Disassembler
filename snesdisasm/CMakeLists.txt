@@ -2,12 +2,13 @@ project(snesdisasm)
 
 set(snesdisasm_src 
     Instructions.cpp
-    FlagRegister.cpp
+    #FlagRegister.cpp
     Logger.cpp
     SNESROM.cpp
     SNESROMHeader.cpp
     ROMAddress.cpp
     Disasm.cpp
+    MachineState.cpp
     CPUState.cpp
     SMCHeader.cpp
 )

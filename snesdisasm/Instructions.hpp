@@ -17,7 +17,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#include "CPUState.hpp"
+#include "MachineState.hpp"
 
 #include <cstdint>
 #include <string>
@@ -52,7 +52,7 @@ class Instruction {
   public:
     /*! \brief Fetches a instruction from the bytes pointed at by data. It uses the given \see CPUState.
      */
-    explicit Instruction(const CPUState &state, const uint8_t *data);
+    explicit Instruction(const MachineState &state, const uint8_t *data);
 
     /*! \brief Returns the size of the Instruction in bytes. This includes the arguments.
      *

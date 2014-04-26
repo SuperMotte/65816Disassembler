@@ -155,12 +155,12 @@ AddressingMode opCodeAddressingMode[256] = {
     /*0xF0*/ PROGRAMMCOUNTER_RELATIVE, DIRECT_INDIRECT_INDEXED, DIRECT_INDIRECT              , DIRECT_INDIRECT_INDEXED_WITH_Y, STACK                , DIRECT_INDEXED_WITH_X, DIRECT_INDEXED_WITH_X, DIRECT_INDIRECT_LONG_INDEXED_WITH_Y, IMPLIED, ABSOLUTE_INDEXED_WITH_Y, STACK      , IMPLIED, ABSOLUTE_INDEXED_INDIRECT, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_WITH_X, ABSOLUTE_INDEXED_LONG_WITH_X
 };
 
-Instruction::Instruction(const CPUState &state, const uint8_t *data)
+Instruction::Instruction(const MachineState &state, const uint8_t *data)
     : m_OpCode {data[0]} {
 
     m_Size = opCodeByteSize[m_OpCode];
 
-    if(state.flagRegister.areFlagsSet(MEMORY_SELECT)) {
+    if(state.getCPUStateRef().areFlagsSet(MEMORY_SELECT)) {
         switch(m_OpCode) {
         case 0x09:
         case 0x29:
@@ -174,7 +174,7 @@ Instruction::Instruction(const CPUState &state, const uint8_t *data)
         }
     }
 
-    if(state.flagRegister.areFlagsSet(INDEX_SELECT)) {
+    if(state.getCPUStateRef().areFlagsSet(INDEX_SELECT)) {
         switch(m_OpCode) {
         case 0xA0:
         case 0xA2:

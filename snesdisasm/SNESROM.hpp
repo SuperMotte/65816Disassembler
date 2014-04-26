@@ -1,7 +1,7 @@
 #ifndef SNESROM_HPP
 #define SNESROM_HPP
 
-#include "FlagRegister.hpp"
+//#include "FlagRegister.hpp"
 #include "SNESROMHeader.hpp"
 #include "Instructions.hpp"
 #include "SMCHeader.hpp"

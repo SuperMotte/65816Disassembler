@@ -19,7 +19,7 @@
 
 #include "SNESROM.hpp"
 #include "Instructions.hpp"
-#include "CPUState.hpp"
+#include "MachineState.hpp"
 
 #include <vector>
 #include <memory>
@@ -52,7 +52,7 @@ public:
     };
 private:
     SNESROM m_ROM;
-    CPUState m_State;
+    MachineState m_State;
 public:
     /*! \brief Constructs disassembler. This constructor will take ownership of the given rom.
      *  \param rom the rom to disassemble
