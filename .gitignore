@@ -3,3 +3,4 @@ CMakeLists.txt.user
 *.SMC
 *Verlauf.log
 *.orig
+diagramms/*~
